@@ -1,5 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+
+    <!-- ─── Splash Background Gradient ─── -->
+    <color name="splash_gradient_top">#1ABCD6</color>
+    <color name="splash_gradient_bottom">#0B7A9E</color>
+
+    <!-- ─── Ripple / Pulse Circles ─── -->
+    <color name="ripple_circle_outer">#0DFFFFFF</color>
+    <color name="ripple_circle_mid">#14FFFFFF</color>
+    <color name="ripple_circle_inner">#1FFFFFFF</color>
+
+    <!-- ─── App Icon Card ─── -->
+    <color name="icon_card_bg">#2BFFFFFF</color>
+    <color name="icon_card_stroke">#40FFFFFF</color>
+
+    <!-- ─── Brand Text ─── -->
+    <color name="brand_white">#FFFFFF</color>
+    <color name="tagline_white">#B3FFFFFF</color>
+
+    <!-- ─── Get Started Button ─── -->
+    <color name="btn_primary_bg">#FFFFFF</color>
+    <color name="btn_primary_text">#0A8FA6</color>
+    <color name="btn_ripple">#220A8FA6</color>
+
+    <!-- ─── Sign In Row ─── -->
+    <color name="signin_label">#B3FFFFFF</color>
+    <color name="signin_link">#FFFFFF</color>
+
+    <!-- ─── Utility ─── -->
+    <color name="transparent">#00000000</color>
+    <color name="white">#FFFFFF</color>
+
 </resources>
