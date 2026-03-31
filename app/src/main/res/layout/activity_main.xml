@@ -49,7 +49,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Connect"
-                android:fontFamily="@font/Sanseriffic"
+                android:fontFamily="@font/sanseriffic"
                 android:textColor="#B3FFFFFF"
                 android:textStyle="bold"
                 android:textSize="40sp"/>
@@ -84,6 +84,7 @@
             android:layout_height="wrap_content"
             android:text="Get Started"
             android:backgroundTint="@color/white"
+            android:onClick="RegisterPage"
             android:textColor="@color/btn_primary_text"/>
 
         <LinearLayout
