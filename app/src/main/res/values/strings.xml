@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">MediConnect</string>
+
+    <string name="underlined_text">This is <u>underlined</u>.</string>
+
+
 </resources>
