@@ -10,6 +10,8 @@ import android.widget.ImageView;
 import android.widget.Toast;
 import android.view.View;
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -31,8 +33,18 @@ public class Register extends AppCompatActivity {
     ImageView imgProfilePreview;
 
     Uri imageUri;
-
     FirebaseAuth auth;
+
+    // ── NEW: Modern image picker launcher ──
+    ActivityResultLauncher<String> imagePickerLauncher = registerForActivityResult(
+            new ActivityResultContracts.GetContent(),
+            uri -> {
+                if (uri != null) {
+                    imageUri = uri;
+                    imgProfilePreview.setImageURI(uri);
+                }
+            }
+    );
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,13 +81,10 @@ public class Register extends AppCompatActivity {
         spinnerSex.setAdapter(adapter);
         spinnerSex.setOnClickListener(v -> spinnerSex.showDropDown());
 
-        // ── Upload Image ──
-        findViewById(R.id.btnUploadPhoto).setOnClickListener(v -> {
-            Intent intent = new Intent();
-            intent.setType("image/*");
-            intent.setAction(Intent.ACTION_GET_CONTENT);
-            startActivityForResult(intent, 1);
-        });
+        // ── Upload Image (FIXED - no longer deprecated) ──
+        findViewById(R.id.btnUploadPhoto).setOnClickListener(v ->
+                imagePickerLauncher.launch("image/*")
+        );
 
         // ── Register Button ──
         findViewById(R.id.btnRegister).setOnClickListener(v -> registerUser());
@@ -89,19 +98,7 @@ public class Register extends AppCompatActivity {
         });
     }
 
-    // ── Handle Image Result ──
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
-            imageUri = data.getData();
-            imgProfilePreview.setImageURI(imageUri);
-        }
-    }
-
-
-
+    // ── REMOVED: onActivityResult (was deprecated) ──
 
     // ── Register User ──
     private void registerUser() {
@@ -124,19 +121,17 @@ public class Register extends AppCompatActivity {
 
     // ── Upload Image ──
     private void uploadImageAndSaveData(String userId) {
-
         if (imageUri != null) {
             StorageReference storageRef = FirebaseStorage.getInstance()
                     .getReference("profile_images/" + userId + ".jpg");
 
             storageRef.putFile(imageUri)
                     .addOnSuccessListener(taskSnapshot ->
-                            storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                                saveUserData(userId, uri.toString());
-                            }))
+                            storageRef.getDownloadUrl().addOnSuccessListener(uri ->
+                                    saveUserData(userId, uri.toString())
+                            ))
                     .addOnFailureListener(e ->
                             Toast.makeText(this, "Image Upload Failed", Toast.LENGTH_SHORT).show());
-
         } else {
             saveUserData(userId, "");
         }
@@ -144,7 +139,6 @@ public class Register extends AppCompatActivity {
 
     // ── Save Data ──
     private void saveUserData(String userId, String imageUrl) {
-
         String firstName = etFirstName.getText().toString();
         String lastName = etLastName.getText().toString();
         String phone = etPhone.getText().toString();
@@ -164,11 +158,8 @@ public class Register extends AppCompatActivity {
                         Toast.makeText(this, "Database Error", Toast.LENGTH_SHORT).show());
     }
 
-    public void SplashAct(View view){
+    public void SplashAct(View view) {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
-
-
-
 }
