@@ -46,6 +46,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:text="← Back"
+                android:onClick="SplashAct"
                 android:textColor="#FFFFFF"
                 android:textSize="13sp"
                 android:fontFamily="sans-serif-medium"

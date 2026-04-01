@@ -8,7 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.Toast;
-
+import android.view.View;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -163,4 +163,12 @@ public class Register extends AppCompatActivity {
                 .addOnFailureListener(e ->
                         Toast.makeText(this, "Database Error", Toast.LENGTH_SHORT).show());
     }
+
+    public void SplashAct(View view){
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+    }
+
+
+
 }
