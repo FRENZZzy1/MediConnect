@@ -14,6 +14,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MediConnect">
         <activity
+            android:name=".TEST"
+            android:exported="false" />
+        <activity
             android:name=".Dashboard"
             android:exported="false" />
         <activity
