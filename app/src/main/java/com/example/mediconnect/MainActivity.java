@@ -23,7 +23,6 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
     }
-
     public void RegisterPage(View view){
         Intent intent = new Intent(this, Register.class);
         startActivity(intent);
