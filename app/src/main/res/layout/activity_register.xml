@@ -20,7 +20,6 @@
             android:layout_height="190dp"
             android:background="@drawable/header_gradient">
 
-            <!-- Decorative circles -->
             <View
                 android:layout_width="150dp"
                 android:layout_height="150dp"
@@ -38,7 +37,6 @@
                 android:layout_marginStart="20dp"
                 android:background="@drawable/circle_decoration" />
 
-            <!-- Back Button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnBack"
                 style="@style/Widget.MaterialComponents.Button.TextButton"
@@ -52,7 +50,6 @@
                 android:fontFamily="sans-serif-medium"
                 app:rippleColor="#33FFFFFF" />
 
-            <!-- Badge -->
             <LinearLayout
                 android:id="@+id/rolePill"
                 android:layout_width="wrap_content"
@@ -68,6 +65,7 @@
                 android:paddingBottom="4dp">
 
                 <TextView
+                    android:id="@+id/tvRolePillLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="🧑  PATIENT REGISTRATION"
@@ -78,7 +76,6 @@
 
             </LinearLayout>
 
-            <!-- Title -->
             <TextView
                 android:id="@+id/tvTitle"
                 android:layout_width="wrap_content"
@@ -92,7 +89,6 @@
                 android:fontFamily="serif"
                 android:lineSpacingMultiplier="1.1" />
 
-            <!-- Step indicators -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -123,7 +119,7 @@
 
         </RelativeLayout>
 
-        <!-- ── FORM CARD ── -->
+        <!-- ── FORM AREA ── -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -131,6 +127,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
+            <!-- ══ ROLE TOGGLE CARD ══ -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -145,96 +142,70 @@
                     android:orientation="vertical"
                     android:padding="20dp">
 
-                    <!-- ── PHOTO UPLOAD ── -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
+                        android:layout_marginBottom="10dp"
                         android:fontFamily="sans-serif-medium"
                         android:letterSpacing="0.12"
-                        android:text="PROFILE PHOTO"
+                        android:text="I AM REGISTERING AS"
                         android:textColor="#6B8CAE"
                         android:textSize="10sp" />
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/cardPhotoUpload"
+                    <!--android:background="@drawable/toggle_bg"-->
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="22dp"
-                        app:cardBackgroundColor="#FAFEFF"
-                        app:cardCornerRadius="14dp"
-                        app:cardElevation="0dp"
-                        app:strokeColor="#1A0891B2"
-                        app:strokeWidth="2dp">
+                        android:orientation="horizontal"
+                        android:padding="4dp">
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal"
-                            android:padding="14dp">
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnRolePatient"
+                            style="@style/Widget.MaterialComponents.Button"
+                            android:layout_width="0dp"
+                            android:layout_height="44dp"
+                            android:layout_weight="1"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="🧑  Patient"
+                            android:textColor="#FFFFFF"
+                            android:textSize="13sp"
+                            app:backgroundTint="#0891B2"
+                            app:cornerRadius="12dp" />
 
-                            <com.google.android.material.card.MaterialCardView
-                                android:layout_width="54dp"
-                                android:layout_height="54dp"
-                                app:cardBackgroundColor="#ECFEFF"
-                                app:cardCornerRadius="27dp"
-                                app:cardElevation="0dp"
-                                app:strokeColor="#330891B2"
-                                app:strokeWidth="2dp">
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnRoleDoctor"
+                            style="@style/Widget.MaterialComponents.Button"
+                            android:layout_width="0dp"
+                            android:layout_height="44dp"
+                            android:layout_marginStart="4dp"
+                            android:layout_weight="1"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="👨‍⚕️  Doctor"
+                            android:textColor="#0891B2"
+                            android:textSize="13sp"
+                            app:backgroundTint="#E0F2F8"
+                            app:cornerRadius="12dp" />
 
-                                <ImageView
-                                    android:id="@+id/imgProfilePreview"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:padding="13dp"
-                                    android:scaleType="centerInside"
-                                    android:src="@android:drawable/ic_menu_camera"
-                                    android:tint="#0891B2" />
+                    </LinearLayout>
 
-                            </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="12dp"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
+            <!-- ══ MAIN FORM CARD ══ -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="6dp">
 
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="sans-serif-medium"
-                                    android:text="Upload Profile Photo"
-                                    android:textColor="#0891B2"
-                                    android:textSize="13sp" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
 
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="2dp"
-                                    android:text="Camera or Gallery · JPG/PNG"
-                                    android:textColor="#6B8CAE"
-                                    android:textSize="11sp" />
-
-                            </LinearLayout>
-
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/btnUploadPhoto"
-                                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Upload"
-                                android:textColor="#0891B2"
-                                android:textSize="11sp"
-                                app:cornerRadius="8dp"
-                                app:strokeColor="#0891B2"
-                                app:strokeWidth="1dp" />
-
-                        </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <!-- ── PERSONAL INFO ── -->
+                    <!-- PERSONAL INFO -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -387,8 +358,9 @@
 
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- Date of Birth -->
+                    <!-- Date of Birth (patient only) -->
                     <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilDOB"
                         style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -415,8 +387,9 @@
 
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- Sex Dropdown -->
+                    <!-- Sex Dropdown (patient only) -->
                     <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilSex"
                         style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -439,6 +412,221 @@
                             android:textSize="14sp" />
 
                     </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- ══ DOCTOR-ONLY FIELDS ══ -->
+                    <LinearLayout
+                        android:id="@+id/layoutDoctorFields"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginBottom="18dp"
+                            android:background="#E0EEF5" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="12dp"
+                            android:fontFamily="sans-serif-medium"
+                            android:letterSpacing="0.12"
+                            android:text="PROFESSIONAL INFORMATION"
+                            android:textColor="#6B8CAE"
+                            android:textSize="10sp" />
+
+                        <!-- PRC License Number -->
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="12dp"
+                            android:hint="PRC License Number"
+                            app:boxBackgroundColor="#F0F7FA"
+                            app:boxBackgroundMode="filled"
+                            app:boxCornerRadiusBottomEnd="12dp"
+                            app:boxCornerRadiusBottomStart="12dp"
+                            app:boxCornerRadiusTopEnd="12dp"
+                            app:boxCornerRadiusTopStart="12dp"
+                            app:boxStrokeColor="#0891B2"
+                            app:hintTextColor="#0891B2"
+                            app:startIconDrawable="@android:drawable/ic_menu_agenda"
+                            app:startIconTint="#0891B2">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etPrcLicense"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="textCapCharacters"
+                                android:textSize="14sp" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <!-- Specialization -->
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="12dp"
+                            android:hint="Specialization"
+                            app:boxBackgroundColor="#F0F7FA"
+                            app:boxBackgroundMode="filled"
+                            app:boxCornerRadiusBottomEnd="12dp"
+                            app:boxCornerRadiusBottomStart="12dp"
+                            app:boxCornerRadiusTopEnd="12dp"
+                            app:boxCornerRadiusTopStart="12dp"
+                            app:boxStrokeColor="#0891B2"
+                            app:hintTextColor="#0891B2"
+                            app:startIconDrawable="@android:drawable/ic_menu_info_details"
+                            app:startIconTint="#0891B2">
+
+                            <AutoCompleteTextView
+                                android:id="@+id/spinnerSpecialization"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textSize="14sp" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <!-- Clinic Name -->
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="12dp"
+                            android:hint="Clinic / Hospital Name"
+                            app:boxBackgroundColor="#F0F7FA"
+                            app:boxBackgroundMode="filled"
+                            app:boxCornerRadiusBottomEnd="12dp"
+                            app:boxCornerRadiusBottomStart="12dp"
+                            app:boxCornerRadiusTopEnd="12dp"
+                            app:boxCornerRadiusTopStart="12dp"
+                            app:boxStrokeColor="#0891B2"
+                            app:hintTextColor="#0891B2"
+                            app:startIconDrawable="@android:drawable/ic_menu_mapmode"
+                            app:startIconTint="#0891B2">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etClinicName"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="textCapWords"
+                                android:textSize="14sp" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <!-- Location -->
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="12dp"
+                            android:hint="Clinic Address / Location"
+                            app:boxBackgroundColor="#F0F7FA"
+                            app:boxBackgroundMode="filled"
+                            app:boxCornerRadiusBottomEnd="12dp"
+                            app:boxCornerRadiusBottomStart="12dp"
+                            app:boxCornerRadiusTopEnd="12dp"
+                            app:boxCornerRadiusTopStart="12dp"
+                            app:boxStrokeColor="#0891B2"
+                            app:hintTextColor="#0891B2"
+                            app:startIconDrawable="@android:drawable/ic_dialog_map"
+                            app:startIconTint="#0891B2">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etLocation"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="textCapSentences"
+                                android:textSize="14sp" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <!-- Available Days -->
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="12dp"
+                            android:hint="Available Days"
+                            app:boxBackgroundColor="#F0F7FA"
+                            app:boxBackgroundMode="filled"
+                            app:boxCornerRadiusBottomEnd="12dp"
+                            app:boxCornerRadiusBottomStart="12dp"
+                            app:boxCornerRadiusTopEnd="12dp"
+                            app:boxCornerRadiusTopStart="12dp"
+                            app:boxStrokeColor="#0891B2"
+                            app:hintTextColor="#0891B2"
+                            app:startIconDrawable="@android:drawable/ic_menu_my_calendar"
+                            app:startIconTint="#0891B2">
+
+                            <AutoCompleteTextView
+                                android:id="@+id/spinnerAvailableDays"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textSize="14sp" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <!-- Consultation Hours -->
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="12dp"
+                            android:hint="Consultation Hours (e.g. 9:00 AM – 5:00 PM)"
+                            app:boxBackgroundColor="#F0F7FA"
+                            app:boxBackgroundMode="filled"
+                            app:boxCornerRadiusBottomEnd="12dp"
+                            app:boxCornerRadiusBottomStart="12dp"
+                            app:boxCornerRadiusTopEnd="12dp"
+                            app:boxCornerRadiusTopStart="12dp"
+                            app:boxStrokeColor="#0891B2"
+                            app:hintTextColor="#0891B2"
+                            app:startIconDrawable="@android:drawable/ic_menu_recent_history"
+                            app:startIconTint="#0891B2">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etConsultationHours"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="textCapSentences"
+                                android:textSize="14sp" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <!-- Consultation Fee -->
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="4dp"
+                            android:hint="Consultation Fee (PHP)"
+                            app:boxBackgroundColor="#F0F7FA"
+                            app:boxBackgroundMode="filled"
+                            app:boxCornerRadiusBottomEnd="12dp"
+                            app:boxCornerRadiusBottomStart="12dp"
+                            app:boxCornerRadiusTopEnd="12dp"
+                            app:boxCornerRadiusTopStart="12dp"
+                            app:boxStrokeColor="#0891B2"
+                            app:hintTextColor="#0891B2"
+                            app:prefixText="₱ "
+                            app:prefixTextColor="#0891B2">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etConsultationFee"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="numberDecimal"
+                                android:textSize="14sp" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                    </LinearLayout>
+                    <!-- ── END DOCTOR FIELDS ── -->
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -503,7 +691,6 @@
                 android:layout_height="54dp"
                 android:layout_marginBottom="10dp"
                 android:fontFamily="sans-serif-medium"
-                android:onClick="RegisterNa"
                 android:letterSpacing="0.03"
                 android:text="Create Account →"
                 android:textSize="15sp"
