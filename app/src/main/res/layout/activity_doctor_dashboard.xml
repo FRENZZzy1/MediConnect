@@ -51,7 +51,7 @@
                     android:background="@drawable/circle_decoration"
                     android:alpha="0.2"/>
 
-                <!-- Top row: greeting + notification bell -->
+                <!-- Top row: greeting + doctor name -->
                 <LinearLayout
                     android:id="@+id/layoutGreeting"
                     android:layout_width="wrap_content"
@@ -73,7 +73,6 @@
                         android:gravity="center_vertical"
                         android:layout_marginTop="4dp">
 
-                        <!-- Doctor avatar placeholder -->
                         <ImageView
                             android:id="@+id/ivDoctorAvatar"
                             android:layout_width="38dp"
@@ -95,7 +94,7 @@
                     </LinearLayout>
                 </LinearLayout>
 
-                 <!-- Notification bell -->
+                <!-- Notification bell -->
                 <ImageView
                     android:id="@+id/ivNotification"
                     android:layout_width="40dp"
@@ -138,7 +137,7 @@
                                 android:id="@+id/tvAppointmentCount"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="8"
+                                android:text="—"
                                 android:textSize="26sp"
                                 android:textStyle="bold"
                                 android:textColor="#0E7490"/>
@@ -155,7 +154,7 @@
                                 android:id="@+id/tvAppointmentChange"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="↑ 2 vs yesterday"
+                                android:text="Confirmed"
                                 android:textSize="9sp"
                                 android:textColor="#10B981"
                                 android:layout_marginTop="2dp"/>
@@ -184,7 +183,7 @@
                                 android:id="@+id/tvPendingCount"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="3"
+                                android:text="—"
                                 android:textSize="26sp"
                                 android:textStyle="bold"
                                 android:textColor="#0E7490"/>
@@ -228,7 +227,7 @@
                                 android:id="@+id/tvPatientCount"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="124"
+                                android:text="—"
                                 android:textSize="26sp"
                                 android:textStyle="bold"
                                 android:textColor="#0E7490"/>
@@ -244,7 +243,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="↑ 1.15%"
+                                android:text="Total"
                                 android:textSize="9sp"
                                 android:textColor="#10B981"
                                 android:layout_marginTop="2dp"/>
@@ -279,7 +278,6 @@
                     android:gravity="center_vertical"
                     android:padding="16dp">
 
-                    <!-- Green dot -->
                     <View
                         android:id="@+id/viewStatusDot"
                         android:layout_width="12dp"
@@ -320,7 +318,7 @@
             </androidx.cardview.widget.CardView>
 
             <!-- ══════════════════════════════════════
-                 TODAY'S SCHEDULE
+                 TODAY'S SCHEDULE HEADER
             ═══════════════════════════════════════ -->
             <LinearLayout
                 android:layout_width="match_parent"
@@ -352,286 +350,40 @@
                     android:textStyle="bold"/>
             </LinearLayout>
 
-            <!-- Appointment Item 1 -->
-            <androidx.cardview.widget.CardView
+            <!-- ══════════════════════════════════════
+                 EMPTY STATE (shown when no appointments)
+            ═══════════════════════════════════════ -->
+            <LinearLayout
+                android:id="@+id/layoutEmptySchedule"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="10dp"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="2dp"
-                app:cardBackgroundColor="@color/white">
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="32dp"
+                android:visibility="gone">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:padding="14dp">
+                    android:text="🗓️"
+                    android:textSize="36sp"/>
 
-                    <LinearLayout
-                        android:layout_width="50dp"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:gravity="center">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="9:00"
-                            android:textColor="#0E7490"
-                            android:textSize="14sp"
-                            android:textStyle="bold"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="AM"
-                            android:textColor="#94A3B8"
-                            android:textSize="10sp"/>
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="1dp"
-                        android:layout_height="40dp"
-                        android:background="#E2E8F0"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginEnd="12dp"/>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Maria Santos"
-                            android:textColor="#1E293B"
-                            android:textSize="14sp"
-                            android:textStyle="bold"/>
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:layout_marginTop="2dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="📹"
-                                android:textSize="10sp"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text=" Video · Cardiology"
-                                android:textColor="#64748B"
-                                android:textSize="12sp"/>
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="👩"
-                        android:textSize="28sp"/>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- Appointment Item 2 -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="10dp"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="2dp"
-                app:cardBackgroundColor="@color/white">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:padding="14dp">
+                    android:text="No appointments today"
+                    android:textColor="#64748B"
+                    android:textSize="14sp"
+                    android:layout_marginTop="8dp"/>
+            </LinearLayout>
 
-                    <LinearLayout
-                        android:layout_width="50dp"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:gravity="center">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="10:30"
-                            android:textColor="#0E7490"
-                            android:textSize="14sp"
-                            android:textStyle="bold"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="AM"
-                            android:textColor="#94A3B8"
-                            android:textSize="10sp"/>
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="1dp"
-                        android:layout_height="40dp"
-                        android:background="#E2E8F0"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginEnd="12dp"/>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Rico Castro"
-                            android:textColor="#1E293B"
-                            android:textSize="14sp"
-                            android:textStyle="bold"/>
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:layout_marginTop="2dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="🏥"
-                                android:textSize="10sp"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text=" In-Person · Follow-up"
-                                android:textColor="#64748B"
-                                android:textSize="12sp"/>
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="👨"
-                        android:textSize="28sp"/>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- Appointment Item 3 -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="10dp"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="2dp"
-                app:cardBackgroundColor="@color/white">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:padding="14dp">
-
-                    <LinearLayout
-                        android:layout_width="50dp"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:gravity="center">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="2:00"
-                            android:textColor="#0E7490"
-                            android:textSize="14sp"
-                            android:textStyle="bold"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="PM"
-                            android:textColor="#94A3B8"
-                            android:textSize="10sp"/>
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="1dp"
-                        android:layout_height="40dp"
-                        android:background="#E2E8F0"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginEnd="12dp"/>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Lisa Tan"
-                            android:textColor="#1E293B"
-                            android:textSize="14sp"
-                            android:textStyle="bold"/>
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:layout_marginTop="2dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="📹"
-                                android:textSize="10sp"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text=" Video · Consultation"
-                                android:textColor="#64748B"
-                                android:textSize="12sp"/>
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="👩"
-                        android:textSize="28sp"/>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- RecyclerView for dynamic appointments -->
+            <!-- ══════════════════════════════════════
+                 DYNAMIC APPOINTMENTS RECYCLERVIEW
+            ═══════════════════════════════════════ -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvAppointments"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
                 android:clipToPadding="false"
                 android:nestedScrollingEnabled="false"/>
 
