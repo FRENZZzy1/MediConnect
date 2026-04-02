@@ -17,6 +17,7 @@ firebaseDatabase = "22.0.1"
 legacySupportV4 = "1.0.0"
 cardview = "1.0.0"
 gridlayout = "1.1.0"
+firebaseFirestore = "26.1.2"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -35,6 +36,7 @@ firebase-database = { group = "com.google.firebase", name = "firebase-database",
 legacy-support-v4 = { group = "androidx.legacy", name = "legacy-support-v4", version.ref = "legacySupportV4" }
 cardview = { group = "androidx.cardview", name = "cardview", version.ref = "cardview" }
 gridlayout = { group = "androidx.gridlayout", name = "gridlayout", version.ref = "gridlayout" }
+firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

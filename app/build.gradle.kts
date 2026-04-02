@@ -50,6 +50,7 @@ dependencies {
     implementation(libs.legacy.support.v4)
     implementation(libs.cardview)
     implementation(libs.gridlayout)
+    implementation(libs.firebase.firestore)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

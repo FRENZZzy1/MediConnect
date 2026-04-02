@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,8 +41,11 @@ public class Register extends AppCompatActivity {
     LinearLayout layoutDoctorFields;
 
     // ── Role toggle & header label ──
-    MaterialButton btnRolePatient, btnRoleDoctor;
+    MaterialButton btnRolePatient, btnRoleDoctor, btnRegister;
     TextView tvRolePillLabel;
+
+    // ── Loading ──
+    ProgressBar progressBar;
 
     // ── State ──
     boolean isDoctor = false;
@@ -56,15 +60,17 @@ public class Register extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
 
         // ── Bind common views ──
-        etFirstName    = findViewById(R.id.etFirstName);
-        etLastName     = findViewById(R.id.etLastName);
-        etEmail        = findViewById(R.id.etEmail);
-        etPhone        = findViewById(R.id.etPhone);
-        etPassword     = findViewById(R.id.etPassword);
-        etDOB          = findViewById(R.id.etDOB);
-        spinnerSex     = findViewById(R.id.spinnerSex);
-        tilDOB         = findViewById(R.id.tilDOB);
-        tilSex         = findViewById(R.id.tilSex);
+        etFirstName  = findViewById(R.id.etFirstName);
+        etLastName   = findViewById(R.id.etLastName);
+        etEmail      = findViewById(R.id.etEmail);
+        etPhone      = findViewById(R.id.etPhone);
+        etPassword   = findViewById(R.id.etPassword);
+        etDOB        = findViewById(R.id.etDOB);
+        spinnerSex   = findViewById(R.id.spinnerSex);
+        tilDOB       = findViewById(R.id.tilDOB);
+        tilSex       = findViewById(R.id.tilSex);
+        progressBar  = findViewById(R.id.progressBar);
+        btnRegister  = findViewById(R.id.btnRegister);
 
         // ── Bind doctor-only views ──
         layoutDoctorFields    = findViewById(R.id.layoutDoctorFields);
@@ -110,7 +116,7 @@ public class Register extends AppCompatActivity {
         spinnerSpecialization.setOnClickListener(v -> spinnerSpecialization.showDropDown());
 
         // ── Available Days dropdown ──
-        String[] availableDays = {
+        String[] availableDayOptions = {
                 "Monday – Friday",
                 "Monday, Wednesday, Friday",
                 "Tuesday, Thursday",
@@ -119,7 +125,7 @@ public class Register extends AppCompatActivity {
                 "By Appointment Only"
         };
         spinnerAvailableDays.setAdapter(new ArrayAdapter<>(this,
-                android.R.layout.simple_dropdown_item_1line, availableDays));
+                android.R.layout.simple_dropdown_item_1line, availableDayOptions));
         spinnerAvailableDays.setOnClickListener(v -> spinnerAvailableDays.showDropDown());
 
         // ── Role toggle ──
@@ -127,7 +133,7 @@ public class Register extends AppCompatActivity {
         btnRoleDoctor.setOnClickListener(v -> switchRole(true));
 
         // ── Register button ──
-        findViewById(R.id.btnRegister).setOnClickListener(v -> registerUser());
+        btnRegister.setOnClickListener(v -> registerUser());
 
         // ── Edge-to-edge padding ──
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -138,7 +144,8 @@ public class Register extends AppCompatActivity {
         });
     }
 
-    // ── Toggle between Patient and Doctor mode ──
+    // ── Toggle between Patient and Doctor mode ────────────────────────────────
+
     private void switchRole(boolean doctorMode) {
         isDoctor = doctorMode;
 
@@ -165,49 +172,81 @@ public class Register extends AppCompatActivity {
         }
     }
 
-    // ── Validate then create Firebase Auth account ──
+    // ── Validate then create Firebase Auth account ────────────────────────────
+
     private void registerUser() {
         String firstName = etFirstName.getText().toString().trim();
         String lastName  = etLastName.getText().toString().trim();
         String email     = etEmail.getText().toString().trim();
         String password  = etPassword.getText().toString().trim();
+        String phone     = etPhone.getText().toString().trim();
 
-        if (firstName.isEmpty() || lastName.isEmpty()) {
-            Toast.makeText(this, "Please enter your full name", Toast.LENGTH_SHORT).show();
+        // ── Validation ──
+        if (firstName.isEmpty()) {
+            etFirstName.setError("First name is required");
+            etFirstName.requestFocus();
             return;
         }
-        if (email.isEmpty() || password.isEmpty()) {
-            Toast.makeText(this, "Email & Password are required", Toast.LENGTH_SHORT).show();
+        if (lastName.isEmpty()) {
+            etLastName.setError("Last name is required");
+            etLastName.requestFocus();
+            return;
+        }
+        if (email.isEmpty()) {
+            etEmail.setError("Email is required");
+            etEmail.requestFocus();
+            return;
+        }
+        if (password.isEmpty()) {
+            etPassword.setError("Password is required");
+            etPassword.requestFocus();
             return;
         }
         if (password.length() < 6) {
-            Toast.makeText(this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show();
+            etPassword.setError("Password must be at least 6 characters");
+            etPassword.requestFocus();
             return;
         }
+
         if (isDoctor) {
             if (etPrcLicense.getText().toString().trim().isEmpty()) {
-                Toast.makeText(this, "PRC License Number is required", Toast.LENGTH_SHORT).show();
+                etPrcLicense.setError("PRC License Number is required");
+                etPrcLicense.requestFocus();
                 return;
             }
             if (spinnerSpecialization.getText().toString().trim().isEmpty()) {
                 Toast.makeText(this, "Please select a specialization", Toast.LENGTH_SHORT).show();
                 return;
             }
+        } else {
+            if (etDOB.getText().toString().trim().isEmpty()) {
+                etDOB.setError("Date of birth is required");
+                etDOB.requestFocus();
+                return;
+            }
+            if (spinnerSex.getText().toString().trim().isEmpty()) {
+                Toast.makeText(this, "Please select your sex", Toast.LENGTH_SHORT).show();
+                return;
+            }
         }
 
+        setLoading(true);
+
         auth.createUserWithEmailAndPassword(email, password)
-                .addOnSuccessListener(authResult ->
-                        saveData(authResult.getUser().getUid()))
-                .addOnFailureListener(e ->
-                        Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show());
+                .addOnSuccessListener(authResult -> {
+                    String userId = authResult.getUser().getUid();
+                    saveData(userId, firstName, lastName, email, phone);
+                })
+                .addOnFailureListener(e -> {
+                    setLoading(false);
+                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+                });
     }
 
-    // ── Save to the correct Realtime Database node ──
-    private void saveData(String userId) {
-        String firstName = etFirstName.getText().toString().trim();
-        String lastName  = etLastName.getText().toString().trim();
-        String email     = etEmail.getText().toString().trim();
-        String phone     = etPhone.getText().toString().trim();
+    // ── Save to the correct Realtime Database node ────────────────────────────
+
+    private void saveData(String userId, String firstName, String lastName,
+                          String email, String phone) {
 
         DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
 
@@ -224,14 +263,23 @@ public class Register extends AppCompatActivity {
             Doctor doctor = new Doctor(
                     fullName, email, prcLicense, specialization,
                     availableDays, consultationHours, consultationFee,
-                    clinicName, location
+                    clinicName, location,
+                    true  // isAvailable default = true
             );
 
             dbRef.child("Doctors").child(userId).setValue(doctor)
-                    .addOnSuccessListener(aVoid ->
-                            Toast.makeText(this, "Doctor account created!", Toast.LENGTH_SHORT).show())
-                    .addOnFailureListener(e ->
-                            Toast.makeText(this, "Database error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                    .addOnSuccessListener(aVoid -> {
+                        setLoading(false);
+                        Toast.makeText(this, "Doctor account created!", Toast.LENGTH_SHORT).show();
+                        // ── Go to Doctor Dashboard ──
+                        Intent intent = new Intent(this, Doctor_Dashboard.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                    })
+                    .addOnFailureListener(e -> {
+                        setLoading(false);
+                        Toast.makeText(this, "Database error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
 
         } else {
             String dob = etDOB.getText().toString().trim();
@@ -240,14 +288,34 @@ public class Register extends AppCompatActivity {
             User user = new User(firstName, lastName, email, phone, dob, sex, "");
 
             dbRef.child("Users").child(userId).setValue(user)
-                    .addOnSuccessListener(aVoid ->
-                            Toast.makeText(this, "Patient account created!", Toast.LENGTH_SHORT).show())
-                    .addOnFailureListener(e ->
-                            Toast.makeText(this, "Database error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                    .addOnSuccessListener(aVoid -> {
+                        setLoading(false);
+                        Toast.makeText(this, "Patient account created!", Toast.LENGTH_SHORT).show();
+                        // ── Go to Patient Dashboard ──
+                        Intent intent = new Intent(this, Dashboard.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                    })
+                    .addOnFailureListener(e -> {
+                        setLoading(false);
+                        Toast.makeText(this, "Database error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
         }
     }
 
+    // ── Loading state ─────────────────────────────────────────────────────────
+
+    private void setLoading(boolean isLoading) {
+        if (progressBar != null) {
+            progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+        }
+        btnRegister.setEnabled(!isLoading);
+        btnRegister.setText(isLoading ? "Creating account..." : "Create Account");
+    }
+
+    // ── Back to login ─────────────────────────────────────────────────────────
+
     public void SplashAct(View view) {
-        startActivity(new Intent(this, MainActivity.class));
+        finish(); // just go back to Login
     }
 }

@@ -1,4 +1,4 @@
-package com.example.mediconnect; // ← Change to your actual package name
+package com.example.mediconnect;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,6 +14,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class Login extends AppCompatActivity {
 
@@ -25,30 +30,26 @@ public class Login extends AppCompatActivity {
 
     // Firebase
     private FirebaseAuth mAuth;
+    private DatabaseReference dbRef;  // ← Realtime Database
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
+        // ← Points to "Doctors" node in Realtime Database
+        dbRef = FirebaseDatabase.getInstance().getReference("Doctors");
 
-        // Bind views
-        etEmail        = findViewById(R.id.etEmail);
-        etPassword     = findViewById(R.id.etPassword);
-        btnLogin       = findViewById(R.id.btnLogin);
+        etEmail          = findViewById(R.id.etEmail);
+        etPassword       = findViewById(R.id.etPassword);
+        btnLogin         = findViewById(R.id.btnLogin);
         tvForgotPassword = findViewById(R.id.tvForgotPassword);
-        tvRegister     = findViewById(R.id.tvRegister);
-        progressBar    = findViewById(R.id.progressBar);
+        tvRegister       = findViewById(R.id.tvRegister);
+        progressBar      = findViewById(R.id.progressBar);
 
-        // Login button
         btnLogin.setOnClickListener(v -> attemptLogin());
-
-        // Forgot password
         tvForgotPassword.setOnClickListener(v -> handleForgotPassword());
-
-        // Navigate to Register
         tvRegister.setOnClickListener(v -> {
             startActivity(new Intent(Login.this, Register.class));
             finish();
@@ -58,10 +59,10 @@ public class Login extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        // If user is already signed in, go directly to MainActivity
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
-            navigateToMain();
+            setLoading(true);
+            navigateByRole(currentUser.getUid());
         }
     }
 
@@ -71,53 +72,72 @@ public class Login extends AppCompatActivity {
         String email    = etEmail.getText() != null ? etEmail.getText().toString().trim() : "";
         String password = etPassword.getText() != null ? etPassword.getText().toString().trim() : "";
 
-        // Validation
         if (TextUtils.isEmpty(email)) {
             etEmail.setError("Email is required");
             etEmail.requestFocus();
             return;
         }
-
         if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             etEmail.setError("Enter a valid email address");
             etEmail.requestFocus();
             return;
         }
-
         if (TextUtils.isEmpty(password)) {
             etPassword.setError("Password is required");
             etPassword.requestFocus();
             return;
         }
-
         if (password.length() < 6) {
             etPassword.setError("Password must be at least 6 characters");
             etPassword.requestFocus();
             return;
         }
 
-        // Show loading state
         setLoading(true);
 
-        // Firebase sign-in
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
-                    setLoading(false);
-
                     if (task.isSuccessful()) {
                         FirebaseUser user = mAuth.getCurrentUser();
                         if (user != null) {
                             Toast.makeText(Login.this,
                                     "Welcome back, " + user.getEmail(),
                                     Toast.LENGTH_SHORT).show();
-                            navigateToMain();
+                            navigateByRole(user.getUid());
                         }
                     } else {
-                        // Map Firebase errors to user-friendly messages
+                        setLoading(false);
                         String errorMessage = getFirebaseErrorMessage(task.getException());
                         Toast.makeText(Login.this, errorMessage, Toast.LENGTH_LONG).show();
                     }
                 });
+    }
+
+    // ─── Role Check using Realtime Database ─────────────────────────────────────
+
+    private void navigateByRole(String uid) {
+        dbRef.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                setLoading(false);
+                if (snapshot.exists()) {
+                    // ── DOCTOR ──
+                    startActivity(new Intent(Login.this, Doctor_Dashboard.class));
+                } else {
+                    // ── PATIENT ──
+                    startActivity(new Intent(Login.this, Dashboard.class));
+                }
+                finish();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                setLoading(false);
+                Toast.makeText(Login.this,
+                        "Error: " + error.getMessage(),
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     // ─── Forgot Password ────────────────────────────────────────────────────────
@@ -130,7 +150,6 @@ public class Login extends AppCompatActivity {
             etEmail.requestFocus();
             return;
         }
-
         if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             etEmail.setError("Enter a valid email address");
             etEmail.requestFocus();
@@ -138,7 +157,6 @@ public class Login extends AppCompatActivity {
         }
 
         setLoading(true);
-
         mAuth.sendPasswordResetEmail(email)
                 .addOnCompleteListener(task -> {
                     setLoading(false);
@@ -162,17 +180,8 @@ public class Login extends AppCompatActivity {
         btnLogin.setText(isLoading ? "Signing in..." : "Sign In");
     }
 
-    private void navigateToMain() {
-        Intent intent = new Intent(this, Dashboard.class);
-        startActivity(intent);
-    }
-
-    /**
-     * Converts Firebase exceptions into readable messages for the user.
-     */
     private String getFirebaseErrorMessage(Exception exception) {
         if (exception == null) return "Login failed. Please try again.";
-
         String message = exception.getMessage();
         if (message == null) return "An unexpected error occurred.";
 
