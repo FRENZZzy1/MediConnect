@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This creates a gradient background for the health status card -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <!-- Gradient from primary teal to darker teal -->
+    <gradient
+        android:angle="135"
+        android:startColor="@color/primary_teal"
+        android:endColor="@color/primary_teal_dark"
+        android:type="linear" />
+
+    <!-- Rounded corners -->
+    <corners android:radius="16dp" />
+</shape>

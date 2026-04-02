@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This creates a rounded rectangle background for cards -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <!-- White background color -->
+    <solid android:color="@color/card_bg" />
+
+    <!-- Rounded corners (16dp radius) -->
+    <corners android:radius="16dp" />
+
+    <!-- Optional: Add a subtle stroke/border -->
+    <stroke
+        android:width="0.5dp"
+        android:color="@color/divider" />
+</shape>

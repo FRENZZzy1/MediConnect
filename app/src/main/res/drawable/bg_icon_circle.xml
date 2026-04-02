@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This creates a circular background for icons -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+
+    <!-- Light teal background -->
+    <solid android:color="@color/icon_bg_teal" />
+
+    <!-- Size will be controlled in layout -->
+</shape>

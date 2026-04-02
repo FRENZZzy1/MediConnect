@@ -5,6 +5,45 @@
     <color name="splash_gradient_top">#1ABCD6</color>
     <color name="splash_gradient_bottom">#0B7A9E</color>
 
+    <!-- ─── Primary Brand Colors ─── -->
+    <color name="primary_teal">#1ABCD6</color>
+    <color name="primary_teal_dark">#0B7A9E</color>
+    <color name="primary_teal_light">#5DD4E5</color>
+
+    <!-- ─── Dashboard Colors ─── -->
+    <color name="dashboard_bg">#F5F7FA</color>
+    <color name="card_bg">#FFFFFF</color>
+    <color name="card_shadow">#1A000000</color>
+
+    <!-- ─── Health Status Colors ─── -->
+    <color name="status_normal">#4CAF50</color>
+    <color name="status_warning">#FF9800</color>
+    <color name="status_critical">#F44336</color>
+
+    <!-- ─── Text Colors ─── -->
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="text_tertiary">#9E9E9E</color>
+    <color name="text_white">#FFFFFF</color>
+
+    <!-- ─── Quick Action Colors ─── -->
+    <color name="action_video">#1ABCD6</color>
+    <color name="action_ai">#9C27B0</color>
+    <color name="action_nearby">#FF5722</color>
+    <color name="action_records">#2196F3</color>
+
+    <!-- ─── Icon Background Colors (Light) ─── -->
+    <color name="icon_bg_teal">#E0F7FA</color>
+    <color name="icon_bg_purple">#F3E5F5</color>
+    <color name="icon_bg_orange">#FBE9E7</color>
+    <color name="icon_bg_blue">#E3F2FD</color>
+
+    <!-- ─── Button Colors ─── -->
+    <color name="btn_primary">#1ABCD6</color>
+    <color name="btn_primary_pressed">#0B7A9E</color>
+    <color name="btn_secondary">#E0F7FA</color>
+    <color name="btn_disabled">#BDBDBD</color>
+
     <!-- ─── Ripple / Pulse Circles ─── -->
     <color name="ripple_circle_outer">#0DFFFFFF</color>
     <color name="ripple_circle_mid">#14FFFFFF</color>
@@ -30,5 +69,7 @@
     <!-- ─── Utility ─── -->
     <color name="transparent">#00000000</color>
     <color name="white">#FFFFFF</color>
+    <color name="divider">#E0E0E0</color>
+    <color name="overlay">#80000000</color>
 
 </resources>
