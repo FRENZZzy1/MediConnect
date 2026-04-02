@@ -40,6 +40,7 @@ dependencies {
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation(libs.constraintlayout)
     implementation(libs.firebase.storage)
     implementation(libs.firebase.auth)
