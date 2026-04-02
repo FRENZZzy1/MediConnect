@@ -296,4 +296,10 @@ public class Dashboard extends AppCompatActivity {
             backPressedTime = System.currentTimeMillis();
         }
     }
+
+    public void AI_CHAT(View view){
+        Intent intent = new Intent(this, AiMedicalActivity.class);
+        startActivity(intent);
+    }
+
 }

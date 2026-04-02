@@ -32,7 +32,7 @@ public class AiMedicalActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private String userName = "there";
 
-    private static final String API_KEY = "DITO LAGAY API";
+    private static final String API_KEY = "API LAGAYAN";
     private static final String API_URL = "https://api.openai.com/v1/chat/completions";
     private final OkHttpClient client = new OkHttpClient();
 
