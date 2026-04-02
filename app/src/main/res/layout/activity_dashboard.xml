@@ -91,7 +91,7 @@
                     android:layout_margin="8dp"
                     app:cardCornerRadius="16dp"
                     app:layout_columnWeight="1">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Schedule\nConsultation" android:layout_gravity="center" android:gravity="center" android:textStyle="bold"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📹\nVideo\nConsultation" android:layout_gravity="center" android:gravity="center" android:textStyle="bold"/>
                 </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
@@ -100,7 +100,7 @@
                     android:layout_margin="8dp"
                     app:cardCornerRadius="16dp"
                     app:layout_columnWeight="1">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Find\nClinics" android:layout_gravity="center" android:gravity="center" android:textStyle="bold"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="💬\nAI\nMedical Q and A" android:layout_gravity="center" android:gravity="center" android:textStyle="bold"/>
                 </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
@@ -109,7 +109,7 @@
                     android:layout_margin="8dp"
                     app:cardCornerRadius="16dp"
                     app:layout_columnWeight="1">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Medical\nRecords" android:layout_gravity="center" android:gravity="center" android:textStyle="bold"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📍\nFind Nearby\nClinics" android:layout_gravity="center" android:gravity="center" android:textStyle="bold"/>
                 </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
@@ -118,7 +118,7 @@
                     android:layout_margin="8dp"
                     app:cardCornerRadius="16dp"
                     app:layout_columnWeight="1">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Pharmacy" android:layout_gravity="center" android:gravity="center" android:textStyle="bold"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📋\nRecords" android:layout_gravity="center" android:gravity="center" android:textStyle="bold"/>
                 </androidx.cardview.widget.CardView>
             </androidx.gridlayout.widget.GridLayout>
 
