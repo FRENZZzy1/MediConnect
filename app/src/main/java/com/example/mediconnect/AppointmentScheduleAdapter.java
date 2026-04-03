@@ -8,6 +8,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.zegocloud.uikit.prebuilt.call.invite.widget.ZegoSendCallInvitationButton;
+import com.zegocloud.uikit.service.defines.ZegoUIKitUser;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class AppointmentScheduleAdapter
@@ -23,86 +27,61 @@ public class AppointmentScheduleAdapter
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_appointment_schedule, parent, false);
+                .inflate(R.layout.item_doctor_consultation_card, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder h, int position) {
         AppointmentItem item = items.get(position);
 
-        // ── Time: split "09:00 AM" into "9:00" and "AM" ──────────────────────
-        if (item.time != null && !item.time.isEmpty()) {
-            String[] parts = item.time.split(" ");
-            if (parts.length == 2) {
-                holder.tvTime.setText(parts[0]);
-                holder.tvAmPm.setText(parts[1]);
-            } else {
-                holder.tvTime.setText(item.time);
-                holder.tvAmPm.setText("");
-            }
+        // Patient name shown where "Dr. Name" would be in the patient card
+        String displayName = (item.patientName != null && !item.patientName.isEmpty())
+                ? item.patientName : "Unknown Patient";
+        h.tvDoctorName.setText(displayName);
+        h.tvAvatar.setText(String.valueOf(displayName.charAt(0)).toUpperCase());
+
+        // Type / specialization label
+        String displayType = (item.type != null && !item.type.isEmpty())
+                ? item.type.toUpperCase() : "GP TELECALL";
+        h.tvSpecialization.setText(displayType);
+
+        // Date · Time
+        String date = item.date != null ? item.date : "";
+        String time = item.time != null ? item.time : "";
+        h.tvDateTime.setText(date + "  ·  " + time);
+
+        // Notes
+        h.tvNotes.setText((item.notes != null && !item.notes.isEmpty())
+                ? item.notes : "No notes");
+
+        // Zego — call the patient
+        if (item.patientId != null && !item.patientId.isEmpty()) {
+            List<ZegoUIKitUser> invitees = new ArrayList<>();
+            invitees.add(new ZegoUIKitUser(item.patientId, displayName));
+            h.btnVideoCall.setInvitees(invitees);
+            h.btnVideoCall.setIsVideoCall(true);
+            h.btnVideoCall.setVisibility(View.VISIBLE);
         } else {
-            holder.tvTime.setText("--:--");
-            holder.tvAmPm.setText("");
-        }
-
-        // ── Patient Name (direct from item) ───────────────────────────────────
-        String patientName = item.patientName != null && !item.patientName.isEmpty()
-                ? item.patientName
-                : "Unknown Patient";
-        holder.tvPatientName.setText(patientName);
-
-        // ── Type + emoji ──────────────────────────────────────────────────────
-        String type = item.type != null ? item.type : "Appointment";
-        holder.tvType.setText(" " + type);
-
-        String typeLower = type.toLowerCase();
-        if (typeLower.contains("video") || typeLower.contains("tele")) {
-            holder.tvTypeEmoji.setText("📹");
-        } else if (typeLower.contains("person") || typeLower.contains("clinic")) {
-            holder.tvTypeEmoji.setText("🏥");
-        } else {
-            holder.tvTypeEmoji.setText("📋");
-        }
-
-        // ── Status badge ──────────────────────────────────────────────────────
-        String status = item.status != null ? item.status.toLowerCase() : "pending";
-        holder.tvStatusBadge.setText(capitalize(status));
-
-        switch (status) {
-            case "confirmed":
-                holder.tvStatusBadge.setBackgroundResource(R.drawable.badge_confirmed);
-                break;
-            case "cancelled":
-                holder.tvStatusBadge.setBackgroundResource(R.drawable.badge_cancelled);
-                break;
-            default: // pending
-                holder.tvStatusBadge.setBackgroundResource(R.drawable.badge_pending);
-                break;
+            h.btnVideoCall.setVisibility(View.GONE);
         }
     }
 
     @Override
-    public int getItemCount() {
-        return items.size();
-    }
-
-    private String capitalize(String s) {
-        if (s == null || s.isEmpty()) return s;
-        return s.substring(0, 1).toUpperCase() + s.substring(1);
-    }
+    public int getItemCount() { return items.size(); }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvTime, tvAmPm, tvPatientName, tvTypeEmoji, tvType, tvStatusBadge;
+        TextView tvAvatar, tvDoctorName, tvSpecialization, tvDateTime, tvNotes;
+        ZegoSendCallInvitationButton btnVideoCall;
 
-        ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            tvTime = itemView.findViewById(R.id.tvTime);
-            tvAmPm = itemView.findViewById(R.id.tvAmPm);
-            tvPatientName = itemView.findViewById(R.id.tvPatientName);
-            tvTypeEmoji = itemView.findViewById(R.id.tvTypeEmoji);
-            tvType = itemView.findViewById(R.id.tvType);
-            tvStatusBadge = itemView.findViewById(R.id.tvStatusBadge);
+        ViewHolder(@NonNull View v) {
+            super(v);
+            tvAvatar         = v.findViewById(R.id.tvAvatar);
+            tvDoctorName     = v.findViewById(R.id.tvDoctorName);   // reused ID — shows patient name
+            tvSpecialization = v.findViewById(R.id.tvSpecialization);
+            tvDateTime       = v.findViewById(R.id.tvDateTime);
+            tvNotes          = v.findViewById(R.id.tvNotes);
+            btnVideoCall     = v.findViewById(R.id.btnVideoCall);
         }
     }
 }

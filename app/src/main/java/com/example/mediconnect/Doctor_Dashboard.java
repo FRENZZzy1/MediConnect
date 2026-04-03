@@ -22,6 +22,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.zegocloud.uikit.prebuilt.call.ZegoUIKitPrebuiltCallService;
+import com.zegocloud.uikit.prebuilt.call.invite.ZegoUIKitPrebuiltCallInvitationConfig;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -32,6 +34,9 @@ import java.util.Locale;
 import java.util.Set;
 
 public class Doctor_Dashboard extends AppCompatActivity {
+
+    private static final long   ZEGO_APP_ID   = 503023280L;
+    private static final String ZEGO_APP_SIGN = "bdfa45fc67d54e89dbfd857cf20ca18091269a18d28367e25f98bc84d214f5ef";
 
     // ── Views ──────────────────────────────────────────────────────────────────
     private TextView tvDoctorName;
@@ -52,8 +57,6 @@ public class Doctor_Dashboard extends AppCompatActivity {
     private AppointmentScheduleAdapter scheduleAdapter;
     private final List<AppointmentItem> scheduleList = new ArrayList<>();
 
-    // ── Today's date string (must match Firestore format) ──────────────────────
-    // Change pattern to match whatever format you store in Firestore, e.g. "yyyy-MM-dd"
     private final String todayDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
             .format(new Date());
 
@@ -67,19 +70,17 @@ public class Doctor_Dashboard extends AppCompatActivity {
         firestore = FirebaseFirestore.getInstance();
 
         bindViews();
-        loadDoctorName();
+        loadDoctorNameThenInitZego();
         loadDashboardStats();
         loadTodaySchedule();
         setupAvailabilityToggle();
 
-        tvViewAll.setOnClickListener(v -> {
-            // TODO: startActivity(new Intent(this, ScheduleActivity.class));
-        });
+        tvViewAll.setOnClickListener(v -> {});
 
         setupBottomNav();
     }
 
-    // ─── Bind Views ──────────────────────────────────────────────────────────────
+    // ─── Bind Views ───────────────────────────────────────────────────────────
 
     private void bindViews() {
         tvDoctorName        = findViewById(R.id.tvDoctorName);
@@ -89,21 +90,20 @@ public class Doctor_Dashboard extends AppCompatActivity {
         tvAvailabilityLabel = findViewById(R.id.tvAvailabilityLabel);
         tvViewAll           = findViewById(R.id.tvViewAll);
         switchAvailability  = findViewById(R.id.switchAvailability);
-        viewStatusDot        = findViewById(R.id.viewStatusDot);
-        layoutEmptySchedule  = findViewById(R.id.layoutEmptySchedule);
-        rvAppointments       = findViewById(R.id.rvAppointments);
-        bottomNav            = findViewById(R.id.bottomNav);
+        viewStatusDot       = findViewById(R.id.viewStatusDot);
+        layoutEmptySchedule = findViewById(R.id.layoutEmptySchedule);
+        rvAppointments      = findViewById(R.id.rvAppointments);
+        bottomNav           = findViewById(R.id.bottomNav);
 
-        // Set up RecyclerView with adapter
         scheduleAdapter = new AppointmentScheduleAdapter(scheduleList);
         rvAppointments.setLayoutManager(new LinearLayoutManager(this));
         rvAppointments.setAdapter(scheduleAdapter);
         rvAppointments.setNestedScrollingEnabled(false);
     }
 
-    // ─── Load Doctor Name ────────────────────────────────────────────────────────
+    // ─── Load doctor name then init Zego ──────────────────────────────────────
 
-    private void loadDoctorName() {
+    private void loadDoctorNameThenInitZego() {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user == null) {
             startActivity(new Intent(this, Login.class));
@@ -114,16 +114,24 @@ public class Doctor_Dashboard extends AppCompatActivity {
         dbRef.child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    String fullName = snapshot.child("fullName").getValue(String.class);
-                    if (fullName != null && !fullName.isEmpty()) {
-                        String cleaned   = fullName.replace("Dr.", "").trim();
-                        String firstName = cleaned.split(" ")[0];
-                        tvDoctorName.setText("Dr. " + firstName);
-                    } else {
-                        tvDoctorName.setText("Doctor");
-                    }
-                }
+                String fullName = snapshot.child("fullName").getValue(String.class);
+                if (fullName == null || fullName.isEmpty()) fullName = user.getUid();
+
+                // Update UI
+                String cleaned   = fullName.replace("Dr.", "").trim();
+                String firstName = cleaned.split(" ")[0];
+                tvDoctorName.setText("Dr. " + firstName);
+
+                // Init Zego — doctor's Firebase UID = their Zego userID
+                // This registers the doctor as reachable for incoming calls
+                ZegoUIKitPrebuiltCallService.init(
+                        getApplication(),
+                        ZEGO_APP_ID,
+                        ZEGO_APP_SIGN,
+                        user.getUid(),
+                        fullName,
+                        new ZegoUIKitPrebuiltCallInvitationConfig()
+                );
             }
 
             @Override
@@ -135,7 +143,7 @@ public class Doctor_Dashboard extends AppCompatActivity {
         });
     }
 
-    // ─── Load Dashboard Stats ────────────────────────────────────────────────────
+    // ─── Load Dashboard Stats ─────────────────────────────────────────────────
 
     private void loadDashboardStats() {
         FirebaseUser user = mAuth.getCurrentUser();
@@ -143,28 +151,21 @@ public class Doctor_Dashboard extends AppCompatActivity {
 
         String uid = user.getUid();
 
-        // ── Card 1: Today's confirmed appointments ──────────────────────────────
         firestore.collection("appointments")
                 .whereEqualTo("doctorId", uid)
-                .whereEqualTo("date", todayDate)          // filter by today
+                .whereEqualTo("date", todayDate)
                 .whereEqualTo("status", "confirmed")
                 .get()
-                .addOnSuccessListener(q ->
-                        tvAppointmentCount.setText(String.valueOf(q.size())))
-                .addOnFailureListener(e ->
-                        tvAppointmentCount.setText("0"));
+                .addOnSuccessListener(q -> tvAppointmentCount.setText(String.valueOf(q.size())))
+                .addOnFailureListener(e -> tvAppointmentCount.setText("0"));
 
-        // ── Card 2: Pending appointments (all time, or filter today if preferred) ─
         firestore.collection("appointments")
                 .whereEqualTo("doctorId", uid)
                 .whereEqualTo("status", "pending")
                 .get()
-                .addOnSuccessListener(q ->
-                        tvPendingCount.setText(String.valueOf(q.size())))
-                .addOnFailureListener(e ->
-                        tvPendingCount.setText("0"));
+                .addOnSuccessListener(q -> tvPendingCount.setText(String.valueOf(q.size())))
+                .addOnFailureListener(e -> tvPendingCount.setText("0"));
 
-        // ── Card 3: Unique patients (all time) ──────────────────────────────────
         firestore.collection("appointments")
                 .whereEqualTo("doctorId", uid)
                 .get()
@@ -176,11 +177,13 @@ public class Doctor_Dashboard extends AppCompatActivity {
                     }
                     tvPatientCount.setText(String.valueOf(patientIds.size()));
                 })
-                .addOnFailureListener(e ->
-                        tvPatientCount.setText("0"));
+                .addOnFailureListener(e -> tvPatientCount.setText("0"));
     }
 
-    // ─── Load Today's Schedule ───────────────────────────────────────────────────
+    // ─── Load Today's Schedule ────────────────────────────────────────────────
+
+    // ─── Load Today's Schedule ────────────────────────────────────────────────
+// Replace your existing loadTodaySchedule() with this:
 
     private void loadTodaySchedule() {
         FirebaseUser user = mAuth.getCurrentUser();
@@ -189,7 +192,7 @@ public class Doctor_Dashboard extends AppCompatActivity {
         firestore.collection("appointments")
                 .whereEqualTo("doctorId", user.getUid())
                 .whereEqualTo("date", todayDate)
-                .orderBy("time", Query.Direction.ASCENDING)   // sort by time field
+                .orderBy("time", Query.Direction.ASCENDING)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     scheduleList.clear();
@@ -203,20 +206,25 @@ public class Doctor_Dashboard extends AppCompatActivity {
                     layoutEmptySchedule.setVisibility(View.GONE);
                     rvAppointments.setVisibility(View.VISIBLE);
 
-                    // Sa loadTodaySchedule() method
                     for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
                         AppointmentItem item = new AppointmentItem();
                         item.appointmentId = doc.getString("appointmentId");
-                        item.patientId = doc.getString("patientId");
-                        item.patientName = doc.getString("patientName");  // ← KUNIN DIN
-                        item.time = doc.getString("time");
-                        item.type = doc.getString("type");
-                        item.status = doc.getString("status");
-                        item.notes = doc.getString("notes");
-                        item.date = doc.getString("date");
-                        scheduleList.add(item);
+                        item.patientId     = doc.getString("patientId");
+                        item.patientName   = doc.getString("patientName"); // stored at booking time
+                        item.time          = doc.getString("time");
+                        item.type          = doc.getString("type");
+                        item.status        = doc.getString("status");
+                        item.notes         = doc.getString("notes");
+                        item.date          = doc.getString("date");
+
+                        // If patientName wasn't saved on the appointment doc, fetch from RTDB
+                        if (item.patientName == null || item.patientName.isEmpty()) {
+                            fetchPatientNameAndAdd(item);
+                        } else {
+                            scheduleList.add(item);
+                            scheduleAdapter.notifyItemInserted(scheduleList.size() - 1);
+                        }
                     }
-                    scheduleAdapter.notifyDataSetChanged();
                 })
                 .addOnFailureListener(e ->
                         Toast.makeText(this,
@@ -224,7 +232,35 @@ public class Doctor_Dashboard extends AppCompatActivity {
                                 Toast.LENGTH_SHORT).show());
     }
 
-    // ─── Availability Toggle ─────────────────────────────────────────────────────
+// ─── Add below loadTodaySchedule() ───────────────────────────────────────
+
+    private void fetchPatientNameAndAdd(AppointmentItem item) {
+        if (item.patientId == null) {
+            item.patientName = "Unknown Patient";
+            scheduleList.add(item);
+            scheduleAdapter.notifyItemInserted(scheduleList.size() - 1);
+            return;
+        }
+
+        FirebaseDatabase.getInstance()
+                .getReference("Users")
+                .child(item.patientId)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    String first = snapshot.child("firstName").getValue(String.class);
+                    String last  = snapshot.child("lastName").getValue(String.class);
+                    String full  = ((first != null ? first : "") + " " + (last != null ? last : "")).trim();
+                    item.patientName = full.isEmpty() ? item.patientId : full;
+                    scheduleList.add(item);
+                    scheduleAdapter.notifyItemInserted(scheduleList.size() - 1);
+                })
+                .addOnFailureListener(e -> {
+                    item.patientName = item.patientId;
+                    scheduleList.add(item);
+                    scheduleAdapter.notifyItemInserted(scheduleList.size() - 1);
+                });
+    }
+    // ─── Availability Toggle ──────────────────────────────────────────────────
 
     private void setupAvailabilityToggle() {
         FirebaseUser user = mAuth.getCurrentUser();
@@ -239,7 +275,6 @@ public class Doctor_Dashboard extends AppCompatActivity {
                         updateAvailabilityUI(available);
                         switchAvailability.setChecked(available);
                     }
-
                     @Override
                     public void onCancelled(DatabaseError error) {}
                 });
@@ -266,22 +301,21 @@ public class Doctor_Dashboard extends AppCompatActivity {
         }
     }
 
-    // ─── Bottom Navigation ───────────────────────────────────────────────────────
+    // ─── Bottom Navigation ────────────────────────────────────────────────────
 
     private void setupBottomNav() {
         bottomNav.setSelectedItemId(R.id.nav_home);
-
         bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.nav_home)     return true;
-            if (id == R.id.nav_schedule) { /* TODO */ return true; }
-            if (id == R.id.nav_patients) { /* TODO */ return true; }
-            if (id == R.id.nav_profile)  { /* TODO */ return true; }
+            if (id == R.id.nav_schedule) { return true; }
+            if (id == R.id.nav_patients) { return true; }
+            if (id == R.id.nav_profile)  { return true; }
             return false;
         });
     }
 
-    // ─── Lifecycle ───────────────────────────────────────────────────────────────
+    // ─── Lifecycle ────────────────────────────────────────────────────────────
 
     @Override
     protected void onStart() {
@@ -290,5 +324,11 @@ public class Doctor_Dashboard extends AppCompatActivity {
             startActivity(new Intent(this, Login.class));
             finish();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ZegoUIKitPrebuiltCallService.unInit();
     }
 }

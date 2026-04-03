@@ -1,3 +1,5 @@
+import java.net.URI
+
 pluginManagement {
     repositories {
         google {
@@ -19,6 +21,8 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven { url = URI("https://maven.zego.im") }   // <- Add this line.
+        maven { url = URI ("https://www.jitpack.io") } // <- Add this line.
     }
 }
 

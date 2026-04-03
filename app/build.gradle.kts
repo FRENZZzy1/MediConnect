@@ -5,21 +5,18 @@ plugins {
 
 android {
     namespace = "com.example.mediconnect"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 36        // ← simple, no block
 
     defaultConfig {
         applicationId = "com.example.mediconnect"
-        minSdk = 24
+        minSdk = 26        // ← must be 24, not 35
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+
+
 
     buildTypes {
         release {
@@ -52,6 +49,7 @@ dependencies {
     implementation(libs.firebase.database)
     implementation(libs.legacy.support.v4)
     implementation(libs.cardview)
+    implementation("im.zego:zego_uikit_prebuilt_call_android:+")
     implementation(libs.gridlayout)
     implementation(libs.firebase.firestore)
     testImplementation(libs.junit)

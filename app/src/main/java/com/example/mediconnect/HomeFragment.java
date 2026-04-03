@@ -87,7 +87,14 @@ public class HomeFragment extends Fragment {
     private void setupClickListeners() {
         settingsIcon.setOnClickListener(v -> showToast("Opening settings..."));
 
-        actionVideoConsult.setOnClickListener(v -> showToast("🎥 Video Consult coming soon!"));
+       // actionVideoConsult.setOnClickListener(v -> showToast("🎥 Video Consult coming soon!"));
+
+        actionVideoConsult.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), Consultation_Schedule.class);
+            startActivity(intent);
+        });
+
+
 
         actionAIChat.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), AiMedicalActivity.class);
