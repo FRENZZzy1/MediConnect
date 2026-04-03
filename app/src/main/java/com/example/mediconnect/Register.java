@@ -292,7 +292,7 @@ public class Register extends AppCompatActivity {
                         setLoading(false);
                         Toast.makeText(this, "Patient account created!", Toast.LENGTH_SHORT).show();
                         // ── Go to Patient Dashboard ──
-                        Intent intent = new Intent(this, Dashboard.class);
+                        Intent intent = new Intent(this, DashboardActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
                     })

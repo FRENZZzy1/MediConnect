@@ -125,7 +125,7 @@ public class Login extends AppCompatActivity {
                     startActivity(new Intent(Login.this, Doctor_Dashboard.class));
                 } else {
                     // ── PATIENT ──
-                    startActivity(new Intent(Login.this, Dashboard.class));
+                    startActivity(new Intent(Login.this, DashboardActivity.class));
                 }
                 finish();
             }

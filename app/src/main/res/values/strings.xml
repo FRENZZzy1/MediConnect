@@ -56,4 +56,18 @@
     <string name="cd_user_avatar">User avatar</string>
     <string name="cd_settings">Settings</string>
     <string name="cd_doctor_avatar">Doctor avatar</string>
+
+    <!-- Doctor Profile -->
+    <string name="doctor_profile_default_name">Doctor</string>
+    <string name="doctor_profile_default_specialty">General Practice</string>
+    <string name="doctor_profile_default_hospital">your preferred hospital</string>
+    <string name="doctor_profile_status_available">Available</string>
+    <string name="doctor_profile_status_busy">Busy</string>
+    <string name="doctor_profile_experience">%1$d yrs exp</string>
+    <string name="doctor_profile_about">Dr. %1$s is a highly experienced %2$s with over %3$d years of practice. Specializing in patient-centered care, they have treated thousands of patients at %4$s.</string>
+    <string name="doctor_profile_selected_date">Feb %1$s</string>
+    <string name="doctor_profile_selected_time">Selected: %1$s</string>
+    <string name="doctor_profile_video_call_selected">Video Call selected</string>
+    <string name="doctor_profile_in_person_selected">In-Person selected</string>
+    <string name="doctor_profile_confirmation">Appointment confirmed!\n%1$s at %2$s</string>
 </resources>

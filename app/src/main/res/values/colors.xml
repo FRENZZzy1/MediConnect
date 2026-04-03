@@ -19,6 +19,8 @@
     <color name="status_normal">#4CAF50</color>
     <color name="status_warning">#FF9800</color>
     <color name="status_critical">#F44336</color>
+    <color name="status_available">#10B981</color>
+    <color name="status_busy">#94A3B8</color>
 
     <!-- ─── Text Colors ─── -->
     <color name="text_primary">#212121</color>
@@ -67,6 +69,7 @@
     <color name="signin_link">#FFFFFF</color>
 
     <!-- ─── Utility ─── -->
+    <color name="accent_orange">#FF9800</color>
     <color name="transparent">#00000000</color>
     <color name="white">#FFFFFF</color>
     <color name="divider">#E0E0E0</color>
