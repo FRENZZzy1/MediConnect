@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Bottom Navigation Text Styles -->
+
+    <!-- Active (Selected) Text Style -->
+    <style name="BottomNavTextActive" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/primary_teal</item>
+    </style>
+
+    <!-- Inactive (Unselected) Text Style -->
+    <style name="BottomNavTextInactive" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/text_tertiary</item>
+    </style>
+
+
+    <style name="NoIndicator">
+        <item name="android:color">@android:color/transparent</item>
+    </style>
+</resources>

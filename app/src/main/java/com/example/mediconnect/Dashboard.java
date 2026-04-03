@@ -248,9 +248,6 @@ public class Dashboard extends AppCompatActivity {
                 showToast("📅 My Appointments");
                 return true;
 
-            } else if (itemId == R.id.nav_chat) {
-                showToast("💬 Messages");
-                return true;
 
             } else if (itemId == R.id.nav_profile) {
                 showToast("👤 My Profile");
