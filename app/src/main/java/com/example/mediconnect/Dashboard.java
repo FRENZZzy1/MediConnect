@@ -195,7 +195,8 @@ public class Dashboard extends AppCompatActivity {
         // FIND NEARBY CLINICS ACTION
         // ───────────────────────────────────────────────────
         actionFindNearby.setOnClickListener(v -> {
-            showToast("📍 Find Nearby feature coming soon!");
+            Intent intent = new Intent(Dashboard.this, FindNearbyActivity.class);
+            startActivity(intent);
         });
 
         // ───────────────────────────────────────────────────
