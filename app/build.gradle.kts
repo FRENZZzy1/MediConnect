@@ -41,6 +41,8 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("org.osmdroid:osmdroid-android:6.1.18")
+    implementation("com.google.android.gms:play-services-location:21.2.0")
     implementation(libs.constraintlayout)
     implementation(libs.firebase.storage)
     implementation(libs.firebase.auth)

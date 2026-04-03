@@ -198,9 +198,6 @@ public class Dashboard extends AppCompatActivity {
         // ───────────────────────────────────────────────────
         actionFindNearby.setOnClickListener(v -> {
             showToast("📍 Find Nearby feature coming soon!");
-            // TODO: Create FindNearbyActivity with map integration
-            // Intent intent = new Intent(Dashboard.this, FindNearbyActivity.class);
-            // startActivity(intent);
         });
 
         // ───────────────────────────────────────────────────
@@ -301,5 +298,14 @@ public class Dashboard extends AppCompatActivity {
         Intent intent = new Intent(this, AiMedicalActivity.class);
         startActivity(intent);
     }
+
+    public void Nearby(View view){
+        Intent intent = new Intent(this, FindNearbyActivity.class);
+        startActivity(intent);
+    }
+
+
+
+
 
 }

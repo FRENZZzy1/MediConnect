@@ -318,7 +318,9 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:padding="16dp"
-                        android:gravity="center">
+                        android:onClick="Nearby"
+                        android:gravity="center"
+                        >
 
                         <View
                             android:layout_width="48dp"
