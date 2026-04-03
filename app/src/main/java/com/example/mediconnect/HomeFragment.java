@@ -96,9 +96,8 @@ public class HomeFragment extends Fragment {
 
         actionFindNearby.setOnClickListener(v -> {
             // Switch to Find tab
-            if (getActivity() instanceof DashboardActivity) {
-                ((DashboardActivity) getActivity()).getBottomNav().setSelectedItemId(R.id.nav_find);
-            }
+            Intent intent = new Intent(getActivity(), FindNearbyActivity.class);
+            startActivity(intent);
         });
 
         actionMyRecords.setOnClickListener(v -> showToast("📋 My Records"));
