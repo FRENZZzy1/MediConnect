@@ -187,10 +187,8 @@ public class Dashboard extends AppCompatActivity {
         // AI MEDICAL CHAT ACTION
         // ───────────────────────────────────────────────────
         actionAIChat.setOnClickListener(v -> {
-            showToast("🤖 AI Medical Chat feature coming soon!");
-            // TODO: Create AIChatActivity
-            // Intent intent = new Intent(Dashboard.this, AIChatActivity.class);
-            // startActivity(intent);
+            Intent intent = new Intent(Dashboard.this, AiMedicalActivity.class);
+            startActivity(intent);
         });
 
         // ───────────────────────────────────────────────────
