@@ -1,19 +1,20 @@
 package com.example.mediconnect;
 
 import android.os.Bundle;
-import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class DashboardActivity extends AppCompatActivity {
 
     private BottomNavigationView bottomNav;
+    private int currentTabPosition = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,14 +32,16 @@ public class DashboardActivity extends AppCompatActivity {
 
         // Load default fragment (Home)
         if (savedInstanceState == null) {
-            loadFragment(new HomeFragment());
+            loadFragment(new HomeFragment(), false, getTabPosition(R.id.nav_home));
             bottomNav.setSelectedItemId(R.id.nav_home);
+            currentTabPosition = getTabPosition(R.id.nav_home);
         }
 
         // Bottom nav click handler
         bottomNav.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
             Fragment selectedFragment = null;
+            int nextTabPosition = getTabPosition(itemId);
 
             if (itemId == R.id.nav_home) {
                 selectedFragment = new HomeFragment();
@@ -53,21 +56,56 @@ public class DashboardActivity extends AppCompatActivity {
             }
 
             if (selectedFragment != null) {
-                loadFragment(selectedFragment);
+                loadFragment(selectedFragment, true, nextTabPosition);
+                currentTabPosition = nextTabPosition;
                 return true;
             }
             return false;
         });
     }
 
-    private void loadFragment(Fragment fragment) {
-        getSupportFragmentManager()
-                .beginTransaction()
+    private void loadFragment(Fragment fragment, boolean animate, int nextTabPosition) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+        if (animate) {
+            if (nextTabPosition > currentTabPosition) {
+                transaction.setCustomAnimations(
+                        R.anim.slide_in_right,
+                        R.anim.slide_out_left,
+                        R.anim.slide_in_left,
+                        R.anim.slide_out_right
+                );
+            } else if (nextTabPosition < currentTabPosition) {
+                transaction.setCustomAnimations(
+                        R.anim.slide_in_left,
+                        R.anim.slide_out_right,
+                        R.anim.slide_in_right,
+                        R.anim.slide_out_left
+                );
+            }
+        }
+
+        transaction
+                .setReorderingAllowed(true)
                 .replace(R.id.fragment_container, fragment)
                 .commit();
     }
 
+    private int getTabPosition(int itemId) {
+        if (itemId == R.id.nav_home) {
+            return 0;
+        } else if (itemId == R.id.nav_find) {
+            return 1;
+        } else if (itemId == R.id.nav_appointments) {
+            return 2;
+        } else if (itemId == R.id.nav_profile) {
+            return 3;
+        }
+        return currentTabPosition;
+    }
+
     // Public method for fragments to access bottom nav if needed
+    @SuppressWarnings("unused")
     public BottomNavigationView getBottomNav() {
         return bottomNav;
     }
