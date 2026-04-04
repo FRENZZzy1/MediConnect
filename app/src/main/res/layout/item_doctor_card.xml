@@ -67,37 +67,6 @@
                 android:layout_marginTop="6dp">
 
                 <TextView
-                    android:id="@+id/doctor_rating"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="★ 4.9"
-                    android:textColor="@color/accent_orange"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-                <View
-                    android:layout_width="1dp"
-                    android:layout_height="12dp"
-                    android:background="@color/divider"
-                    android:layout_marginHorizontal="8dp"
-                    android:layout_gravity="center_vertical" />
-
-                <TextView
-                    android:id="@+id/doctor_experience"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="12 yrs exp"
-                    android:textColor="@color/text_tertiary"
-                    android:textSize="12sp" />
-
-                <View
-                    android:layout_width="1dp"
-                    android:layout_height="12dp"
-                    android:background="@color/divider"
-                    android:layout_marginHorizontal="8dp"
-                    android:layout_gravity="center_vertical" />
-
-                <TextView
                     android:id="@+id/doctor_distance"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

@@ -2,6 +2,10 @@ package com.example.mediconnect;
 
 public class Doctor {
 
+
+    public String uid;
+    public String yearsOfExperience;
+
     public String fullName;
     public String email;
     public String prcLicense;
