@@ -116,7 +116,8 @@ public class FindFragment extends Fragment {
         List<String> specialties = new ArrayList<>();
         specialties.add("All");
         for (Doctor d : doctors) {
-            if (d.specialization != null && !specialties.contains(d.specialization)) {
+            // Only include specialties of available doctors
+            if (d.isAvailable && d.specialization != null && !specialties.contains(d.specialization)) {
                 specialties.add(d.specialization);
             }
         }
@@ -173,7 +174,7 @@ public class FindFragment extends Fragment {
         intent.putExtra("doctor_consultation_fee",   doctor.consultationFee);
         intent.putExtra("doctor_email",              doctor.email);
         intent.putExtra("doctor_prc_license",        doctor.prcLicense);
-        intent.putExtra("doctor_years_experience",   doctor.yearsOfExperience); // ← new
+        intent.putExtra("doctor_years_experience",   doctor.yearsOfExperience);
         startActivity(intent);
     }
 
@@ -199,6 +200,10 @@ public class FindFragment extends Fragment {
             displayList.clear();
 
             for (Doctor doctor : fullList) {
+
+                // ── Hide doctors that are not available ──────────────────────
+                if (!doctor.isAvailable) continue;
+
                 boolean matchesChip = specialty.equals("All") ||
                         (doctor.specialization != null &&
                                 doctor.specialization.equalsIgnoreCase(specialty));
@@ -243,23 +248,15 @@ public class FindFragment extends Fragment {
             if (doctor.clinicName != null)      specialtyLine += " • " + doctor.clinicName;
             holder.specialtyText.setText(specialtyLine);
 
-
             // Location
             holder.distanceText.setText(
                     doctor.location != null ? "📍 " + doctor.location : "");
 
-            // Availability status
-            if (doctor.isAvailable) {
-                holder.statusDot.setBackgroundResource(R.drawable.bg_status_available);
-                holder.statusText.setText("Available");
-                holder.statusText.setTextColor(
-                        getResources().getColor(R.color.status_available));
-            } else {
-                holder.statusDot.setBackgroundResource(R.drawable.bg_status_busy);
-                holder.statusText.setText("Not Accepting");
-                holder.statusText.setTextColor(
-                        getResources().getColor(R.color.status_busy));
-            }
+            // Availability status — always "Available" here since we filter out unavailable
+            holder.statusDot.setBackgroundResource(R.drawable.bg_status_available);
+            holder.statusText.setText("Available");
+            holder.statusText.setTextColor(
+                    getResources().getColor(R.color.status_available));
 
             // Click listeners
             holder.bookButton.setOnClickListener(v -> openDoctorProfile(doctor));
@@ -282,7 +279,7 @@ public class FindFragment extends Fragment {
                 super(itemView);
                 nameText       = itemView.findViewById(R.id.doctor_name);
                 specialtyText  = itemView.findViewById(R.id.doctor_specialty);
-                distanceText   = itemView.findViewById(R.id.doctor_distance);   // ← was missing
+                distanceText   = itemView.findViewById(R.id.doctor_distance);
                 statusText     = itemView.findViewById(R.id.doctor_status);
                 statusDot      = itemView.findViewById(R.id.status_dot);
                 bookButton     = itemView.findViewById(R.id.book_button);
