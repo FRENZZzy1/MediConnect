@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- ─── Splash Background Gradient (Dark) ─── -->
+    <color name="splash_gradient_top">#0B5A7A</color>
+    <color name="splash_gradient_bottom">#052C3F</color>
+
+    <!-- ─── Primary Brand Colors (Dark) ─── -->
+    <color name="primary_teal">#00BCD4</color>
+    <color name="primary_teal_dark">#0097A7</color>
+    <color name="primary_teal_light">#80DEEA</color>
+
+    <!-- ─── Dashboard Colors (Dark) ─── -->
+    <color name="dashboard_bg">#121212</color>
+    <color name="card_bg">#1E1E1E</color>
+    <color name="card_shadow">#0A000000</color>
+
+    <!-- ─── Health Status Colors (Dark) ─── -->
+    <color name="status_normal">#66BB6A</color>
+    <color name="status_warning">#FFA726</color>
+    <color name="status_critical">#EF5350</color>
+    <color name="status_available">#26A69A</color>
+    <color name="status_busy">#90A4AE</color>
+
+    <!-- ─── Text Colors (Dark) ─── -->
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#B0B0B0</color>
+    <color name="text_tertiary">#757575</color>
+
+    <!-- ─── Bottom Navigation Colors (Dark) ─── -->
+    <color name="bottom_nav_icon_color">#757575</color>
+    <color name="bottom_nav_text_color">#757575</color>
+
+    <!-- ─── Quick Action Colors (Dark) ─── -->
+    <color name="action_video">#00BCD4</color>
+    <color name="action_ai">#BA68C8</color>
+    <color name="action_nearby">#FF7043</color>
+    <color name="action_records">#42A5F5</color>
+
+    <!-- ─── Icon Background Colors (Dark) ─── -->
+    <color name="icon_bg_teal">#004D5C</color>
+    <color name="icon_bg_purple">#4A148C</color>
+    <color name="icon_bg_orange">#E65100</color>
+    <color name="icon_bg_blue">#01579B</color>
+
+    <!-- ─── Button Colors (Dark) ─── -->
+    <color name="btn_primary">#00BCD4</color>
+    <color name="btn_primary_pressed">#0097A7</color>
+    <color name="btn_secondary">#263238</color>
+    <color name="btn_disabled">#424242</color>
+
+    <!-- ─── Ripple / Pulse Circles (Dark) ─── -->
+    <color name="ripple_circle_outer">#1AFFFFFF</color>
+    <color name="ripple_circle_mid">#20FFFFFF</color>
+    <color name="ripple_circle_inner">#2FFFFFFF</color>
+
+    <!-- ─── App Icon Card (Dark) ─── -->
+    <color name="icon_card_bg">#2B2B2B</color>
+    <color name="icon_card_stroke">#40FFFFFF</color>
+
+    <!-- ─── Brand Text (Dark) ─── -->
+    <color name="brand_white">#FFFFFF</color>
+    <color name="tagline_white">#B3FFFFFF</color>
+
+    <!-- ─── Get Started Button (Dark) ─── -->
+    <color name="btn_primary_bg">#1E1E1E</color>
+    <color name="btn_primary_text">#00BCD4</color>
+    <color name="btn_ripple">#2200BCD4</color>
+
+    <!-- ─── Sign In Row (Dark) ─── -->
+    <color name="signin_label">#B3FFFFFF</color>
+    <color name="signin_link">#00BCD4</color>
+
+    <!-- ─── Utility (Dark) ─── -->
+    <color name="accent_orange">#FF9800</color>
+    <color name="transparent">#00000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="divider">#424242</color>
+    <color name="overlay">#80000000</color>
+
+    <color name="accent_coral">#FF7043</color>
+    <color name="primary_teal_50">#1A3A42</color>
+</resources>
+

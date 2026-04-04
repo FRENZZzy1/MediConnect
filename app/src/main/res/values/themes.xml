@@ -1,8 +1,20 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.MediConnect" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <!-- Light Theme Customization -->
+        <item name="colorPrimary">@color/primary_teal</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/primary_teal_light</item>
+        <item name="colorOnPrimaryContainer">@color/primary_teal_dark</item>
+
+        <!-- Surface Colors -->
+        <item name="android:colorBackground">@color/dashboard_bg</item>
+        <item name="colorSurface">@color/card_bg</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+
+        <!-- Error Colors -->
+        <item name="colorError">@color/status_critical</item>
+        <item name="colorOnError">@color/white</item>
     </style>
 
     <style name="Theme.MediConnect" parent="Base.Theme.MediConnect" />

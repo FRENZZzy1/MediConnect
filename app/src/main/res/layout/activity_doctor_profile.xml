@@ -31,10 +31,10 @@
                     android:id="@+id/back_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
                     android:clickable="true"
                     android:focusable="true"
-                    android:background="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:minHeight="48dp"
                     android:paddingVertical="8dp">
 
                     <ImageView
@@ -46,10 +46,10 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
                         android:text="Back to results"
                         android:textColor="@color/white"
-                        android:textSize="14sp"
-                        android:layout_marginStart="8dp" />
+                        android:textSize="14sp" />
                 </LinearLayout>
 
                 <!-- Doctor Profile Header -->
@@ -98,7 +98,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Cardiologist"
-                            android:textColor="@color/text_white"
+                            android:textColor="@color/white"
                             android:textSize="14sp"
                             android:alpha="0.9"
                             android:layout_marginTop="2dp" />
@@ -108,7 +108,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="St. Luke's Hospital"
-                            android:textColor="@color/text_white"
+                            android:textColor="@color/white"
                             android:textSize="13sp"
                             android:alpha="0.8"
                             android:layout_marginTop="2dp" />
@@ -137,7 +137,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="12 yrs exp"
-                                android:textColor="@color/text_white"
+                                android:textColor="@color/white"
                                 android:textSize="12sp"
                                 android:layout_marginStart="12dp" />
 

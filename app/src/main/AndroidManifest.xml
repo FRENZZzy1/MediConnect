@@ -16,13 +16,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MediConnect">
         <activity
+            android:name=".AppointmentDetailActivity"
+            android:exported="false" />
+        <activity
             android:name=".Consultation_Schedule"
-            android:exported="false" />
-        <activity
-            android:name=".ProfileFragment"
-            android:exported="false" />
-        <activity
-            android:name=".AppointmentsFragment"
             android:exported="false" />
         <activity
             android:name=".DoctorProfileActivity"
