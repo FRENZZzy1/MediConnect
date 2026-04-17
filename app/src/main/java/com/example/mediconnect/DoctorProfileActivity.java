@@ -11,19 +11,34 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 public class DoctorProfileActivity extends AppCompatActivity {
 
     private LinearLayout backButton;
     private TextView doctorName, doctorSpecialty, doctorHospital, doctorRating,
-            doctorExperience, doctorStatus, aboutText;
+            doctorExperience, doctorStatus, aboutText, availableSlotsLabel;
     private LinearLayout videoCallButton, inPersonButton;
     private CardView confirmButton;
     private View statusDot;
+    private LinearLayout calendarContainer, timeSlotsContainer;
 
-    private String selectedDate = "Feb 26";
-    private String selectedTime = "10:30 AM";
+    private String selectedDate = null;
+    private String selectedTime = null;
+    private List<String> availableDaysList = new ArrayList<>();
+    private String consultationHoursRaw = "";
+    private View lastSelectedDayView = null;
+    private TextView lastSelectedTimeView = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,9 +46,7 @@ public class DoctorProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_doctor_profile);
 
         initializeViews();
-        loadDoctorData();
-        setupCalendar();
-        setupTimeSlots();
+        loadDoctorDataFromFirebase();
         setupClickListeners();
     }
 
@@ -50,120 +63,295 @@ public class DoctorProfileActivity extends AppCompatActivity {
         videoCallButton = findViewById(R.id.video_call_button);
         inPersonButton = findViewById(R.id.in_person_button);
         confirmButton = findViewById(R.id.confirm_appointment_button);
+        calendarContainer = findViewById(R.id.calendar_days_container);
+        timeSlotsContainer = findViewById(R.id.time_slots_container);
+        availableSlotsLabel = findViewById(R.id.available_slots_label); // add this id to your XML TextView
     }
 
-    private void loadDoctorData() {
-        Intent intent = getIntent();
-        String name = intent.getStringExtra("doctor_name");
-        String specialty = intent.getStringExtra("doctor_specialty");
-        String hospital = intent.getStringExtra("doctor_hospital");
-        float rating = intent.getFloatExtra("doctor_rating", 0);
-        int experience = intent.getIntExtra("doctor_experience", 0);
-        boolean isAvailable = intent.getBooleanExtra("doctor_available", false);
+    private void loadDoctorDataFromFirebase() {
+        String doctorUid = getIntent().getStringExtra("doctor_uid");
 
-        if (name == null || name.trim().isEmpty()) {
-            name = getString(R.string.doctor_profile_default_name);
-        }
-        if (specialty == null || specialty.trim().isEmpty()) {
-            specialty = getString(R.string.doctor_profile_default_specialty);
-        }
-        if (hospital == null || hospital.trim().isEmpty()) {
-            hospital = getString(R.string.doctor_profile_default_hospital);
+        if (doctorUid == null || doctorUid.isEmpty()) {
+            Toast.makeText(this, "Doctor not found.", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
         }
 
-        doctorName.setText(name);
-        doctorSpecialty.setText(specialty);
-        doctorHospital.setText(hospital);
-        doctorRating.setText(String.format(Locale.getDefault(), "★ %.1f", rating));
-        doctorExperience.setText(getString(R.string.doctor_profile_experience, experience));
+        DatabaseReference ref = FirebaseDatabase.getInstance()
+                .getReference("Doctors")
+                .child(doctorUid);
 
-        if (isAvailable) {
-            statusDot.setBackgroundResource(R.drawable.bg_status_dot);
-            doctorStatus.setText(R.string.doctor_profile_status_available);
-            doctorStatus.setTextColor(ContextCompat.getColor(this, R.color.status_normal));
-        } else {
-            statusDot.setBackgroundResource(R.drawable.circle_status_inactive);
-            doctorStatus.setText(R.string.doctor_profile_status_busy);
-            doctorStatus.setTextColor(ContextCompat.getColor(this, R.color.text_tertiary));
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (!snapshot.exists()) {
+                    Toast.makeText(DoctorProfileActivity.this, "Doctor data not found.", Toast.LENGTH_SHORT).show();
+                    finish();
+                    return;
+                }
+
+                String name = snapshot.child("fullName").getValue(String.class);
+                String specialty = snapshot.child("specialization").getValue(String.class);
+                String clinic = snapshot.child("clinicName").getValue(String.class);
+                String location = snapshot.child("location").getValue(String.class);
+                Boolean isAvailable = snapshot.child("isAvailable").getValue(Boolean.class);
+                String availableDays = snapshot.child("availableDays").getValue(String.class);
+                String consultationHours = snapshot.child("consultationHours").getValue(String.class);
+                String feeStr = snapshot.child("consultationFee").getValue(String.class);
+
+                if (name == null) name = "Unknown Doctor";
+                if (specialty == null) specialty = "General";
+                if (clinic == null) clinic = "Unknown Clinic";
+                if (location == null) location = "";
+                if (isAvailable == null) isAvailable = false;
+                if (availableDays == null) availableDays = "";
+                if (consultationHours == null) consultationHours = "9:00 am - 5:00 pm";
+                if (feeStr == null) feeStr = "0";
+
+                consultationHoursRaw = consultationHours;
+                parseAvailableDays(availableDays);
+
+                // Set UI
+                doctorName.setText(name);
+                doctorSpecialty.setText(specialty);
+                doctorHospital.setText(clinic + (location.isEmpty() ? "" : " · " + location));
+                doctorRating.setText("★ 4.9"); // static or add rating field in DB
+                doctorExperience.setText("Fee: ₱" + feeStr);
+
+                if (isAvailable) {
+                    statusDot.setBackgroundResource(R.drawable.bg_status_dot);
+                    doctorStatus.setText("Available");
+                    doctorStatus.setTextColor(ContextCompat.getColor(DoctorProfileActivity.this, R.color.status_normal));
+                } else {
+                    statusDot.setBackgroundResource(R.drawable.circle_status_inactive);
+                    doctorStatus.setText("Busy");
+                    doctorStatus.setTextColor(ContextCompat.getColor(DoctorProfileActivity.this, R.color.text_tertiary));
+                }
+
+                String displayName = name.startsWith("Dr. ") ? name.substring(4) : name;
+                aboutText.setText("Dr. " + displayName + " is a " + specialty.toLowerCase()
+                        + " available at " + clinic + ". Consultation fee: ₱" + feeStr
+                        + ". Available on " + availableDays + ", " + consultationHours + ".");
+
+                setupCalendar();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                Toast.makeText(DoctorProfileActivity.this,
+                        "Failed to load doctor: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    /**
+     * Parses "Saturday & Sunday" or "Monday, Wednesday, Friday" etc.
+     * into a list of Calendar.DAY_OF_WEEK integers for comparison.
+     */
+    private void parseAvailableDays(String availableDays) {
+        availableDaysList.clear();
+        if (availableDays == null || availableDays.isEmpty()) return;
+
+        String[] parts = availableDays.split("[,&]");
+        for (String part : parts) {
+            availableDaysList.add(part.trim().toLowerCase(Locale.getDefault()));
         }
+    }
 
-        // About section text
-        String displayName = name.startsWith("Dr. ") ? name.substring(4) : name;
-        aboutText.setText(getString(R.string.doctor_profile_about,
-                displayName,
-                specialty.toLowerCase(Locale.getDefault()),
-                experience,
-                hospital));
+    private boolean isDayAvailable(Calendar cal) {
+        if (availableDaysList.isEmpty()) return false;
+
+        String[] dayNames = {"sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"};
+        int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK); // 1=Sunday, 7=Saturday
+        String dayName = dayNames[dayOfWeek - 1];
+
+        for (String available : availableDaysList) {
+            if (available.contains(dayName) || dayName.contains(available.replace("day", ""))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void setupCalendar() {
-        // Calendar days
-        String[] days = {"23", "24", "25", "26", "27", "28"};
-        String[] weekdays = {"Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"};
+        calendarContainer.removeAllViews();
 
-        LinearLayout calendarContainer = findViewById(R.id.calendar_days_container);
+        Calendar cal = Calendar.getInstance();
+        // Show next 30 days
+        SimpleDateFormat monthFormat = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
+        SimpleDateFormat dayNumFormat = new SimpleDateFormat("d", Locale.getDefault());
+        SimpleDateFormat dayWeekFormat = new SimpleDateFormat("EEE", Locale.getDefault());
+        SimpleDateFormat fullDateFormat = new SimpleDateFormat("MMM d", Locale.getDefault());
 
-        for (int i = 0; i < days.length; i++) {
-            final String dayNumberText = days[i];
+        for (int i = 0; i < 30; i++) {
+            Calendar day = (Calendar) cal.clone();
+            day.add(Calendar.DAY_OF_MONTH, i);
+
+            boolean available = isDayAvailable(day);
+
             View dayView = getLayoutInflater().inflate(R.layout.item_calendar_day, calendarContainer, false);
             TextView dayNumber = dayView.findViewById(R.id.day_number);
             TextView dayWeek = dayView.findViewById(R.id.day_week);
 
-            dayNumber.setText(dayNumberText);
-            dayWeek.setText(weekdays[(i + 2) % 7]); // Start from Thursday
+            dayNumber.setText(dayNumFormat.format(day.getTime()));
+            dayWeek.setText(dayWeekFormat.format(day.getTime()));
 
-            // Highlight selected date (26)
-            if (dayNumberText.equals("26")) {
-                dayView.setBackgroundResource(R.drawable.bg_calendar_selected);
-                dayNumber.setTextColor(ContextCompat.getColor(this, R.color.white));
-            } else {
+            if (!available) {
+                // Grayed out, not clickable
+                dayView.setAlpha(0.3f);
                 dayView.setBackgroundResource(R.drawable.bg_calendar_unselected);
+                dayView.setEnabled(false);
+            } else {
+                dayView.setAlpha(1.0f);
+                dayView.setBackgroundResource(R.drawable.bg_calendar_unselected);
+                dayView.setEnabled(true);
+
+                final String dateLabel = fullDateFormat.format(day.getTime());
+                final Calendar finalDay = day;
+                dayView.setOnClickListener(v -> {
+                    selectedDate = dateLabel;
+                    selectedTime = null;
+
+                    // Reset previous selection
+                    if (lastSelectedDayView != null) {
+                        lastSelectedDayView.setBackgroundResource(R.drawable.bg_calendar_unselected);
+                        ((TextView) ((LinearLayout) lastSelectedDayView).getChildAt(0))
+                                .setTextColor(ContextCompat.getColor(this, R.color.text_primary));
+                    }
+
+                    v.setBackgroundResource(R.drawable.bg_calendar_selected);
+                    ((TextView) ((LinearLayout) v).getChildAt(0))
+                            .setTextColor(ContextCompat.getColor(this, R.color.white));
+                    lastSelectedDayView = v;
+
+                    if (availableSlotsLabel != null) {
+                        availableSlotsLabel.setText("Available Slots - " + dateLabel);
+                    }
+                    setupTimeSlots();
+                });
             }
 
-            final String date = getString(R.string.doctor_profile_selected_date, dayNumberText);
-            dayView.setOnClickListener(v -> {
-                selectedDate = date;
-                Toast.makeText(this, date, Toast.LENGTH_SHORT).show();
-                // Update UI to show selection
-            });
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    72, LinearLayout.LayoutParams.WRAP_CONTENT);
+            params.setMargins(0, 0, 12, 0);
+            dayView.setLayoutParams(params);
 
             calendarContainer.addView(dayView);
         }
     }
 
+    /**
+     * Parses "9:00 am - 5:00 am" and generates 30-minute slots.
+     */
     private void setupTimeSlots() {
-        String[] times = {"9:00 AM", "9:30 AM", "10:00 AM", "10:30 AM", "11:00 AM",
-                "2:00 PM", "2:30 PM", "3:00 PM"};
+        timeSlotsContainer.removeAllViews();
+        lastSelectedTimeView = null;
 
-        LinearLayout slotsContainer = findViewById(R.id.time_slots_container);
+        List<String> slots = generateTimeSlots(consultationHoursRaw);
 
-        for (String time : times) {
+        if (slots.isEmpty()) {
+            TextView empty = new TextView(this);
+            empty.setText("No available time slots.");
+            empty.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+            timeSlotsContainer.addView(empty);
+            return;
+        }
+
+        // Make it wrap
+        timeSlotsContainer.setOrientation(LinearLayout.HORIZONTAL);
+
+        // Use a FlowLayout workaround: wrap in a custom flow using nested LinearLayouts
+        LinearLayout row = null;
+        int perRow = 4;
+        for (int i = 0; i < slots.size(); i++) {
+            if (i % perRow == 0) {
+                row = new LinearLayout(this);
+                row.setOrientation(LinearLayout.HORIZONTAL);
+                LinearLayout.LayoutParams rowParams = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT);
+                rowParams.setMargins(0, 0, 0, 12);
+                row.setLayoutParams(rowParams);
+                timeSlotsContainer.setOrientation(LinearLayout.VERTICAL);
+                timeSlotsContainer.addView(row);
+            }
+
+            String time = slots.get(i);
             TextView slotView = new TextView(this);
             slotView.setText(time);
             slotView.setPadding(24, 16, 24, 16);
-
-            if (time.equals("10:30 AM")) {
-                // Selected slot
-                slotView.setBackgroundResource(R.drawable.bg_time_slot_selected);
-                slotView.setTextColor(ContextCompat.getColor(this, R.color.white));
-            } else {
-                slotView.setBackgroundResource(R.drawable.bg_time_slot_unselected);
-                slotView.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-            }
+            slotView.setBackgroundResource(R.drawable.bg_time_slot_unselected);
+            slotView.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
 
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-            );
-            params.setMargins(0, 0, 12, 12);
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
+            params.setMargins(0, 0, 12, 0);
             slotView.setLayoutParams(params);
 
             slotView.setOnClickListener(v -> {
                 selectedTime = time;
-                Toast.makeText(this, getString(R.string.doctor_profile_selected_time, time), Toast.LENGTH_SHORT).show();
+
+                if (lastSelectedTimeView != null) {
+                    lastSelectedTimeView.setBackgroundResource(R.drawable.bg_time_slot_unselected);
+                    lastSelectedTimeView.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+                }
+
+                slotView.setBackgroundResource(R.drawable.bg_time_slot_selected);
+                slotView.setTextColor(ContextCompat.getColor(this, R.color.white));
+                lastSelectedTimeView = slotView;
             });
 
-            slotsContainer.addView(slotView);
+            if (row != null) row.addView(slotView);
+        }
+    }
+
+    /**
+     * Generates 30-minute time slots from a range like "9:00 am - 5:00 pm"
+     */
+    private List<String> generateTimeSlots(String hoursRaw) {
+        List<String> slots = new ArrayList<>();
+        try {
+            String cleaned = hoursRaw.toLowerCase(Locale.getDefault()).trim();
+            String[] parts = cleaned.split("-");
+            if (parts.length < 2) return slots;
+
+            int startMinutes = parseTimeToMinutes(parts[0].trim());
+            int endMinutes = parseTimeToMinutes(parts[1].trim());
+
+            if (startMinutes < 0 || endMinutes < 0) return slots;
+
+            SimpleDateFormat sdf = new SimpleDateFormat("h:mm a", Locale.getDefault());
+            Calendar cal = Calendar.getInstance();
+
+            for (int m = startMinutes; m < endMinutes; m += 30) {
+                cal.set(Calendar.HOUR_OF_DAY, m / 60);
+                cal.set(Calendar.MINUTE, m % 60);
+                slots.add(sdf.format(cal.getTime()));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return slots;
+    }
+
+    private int parseTimeToMinutes(String timeStr) {
+        try {
+            timeStr = timeStr.trim();
+            boolean isPM = timeStr.contains("pm");
+            boolean isAM = timeStr.contains("am");
+            timeStr = timeStr.replace("am", "").replace("pm", "").trim();
+
+            String[] parts = timeStr.split(":");
+            int hours = Integer.parseInt(parts[0].trim());
+            int minutes = parts.length > 1 ? Integer.parseInt(parts[1].trim()) : 0;
+
+            if (isPM && hours != 12) hours += 12;
+            if (isAM && hours == 12) hours = 0;
+
+            return hours * 60 + minutes;
+        } catch (Exception e) {
+            return -1;
         }
     }
 
@@ -173,20 +361,26 @@ public class DoctorProfileActivity extends AppCompatActivity {
         videoCallButton.setOnClickListener(v -> {
             videoCallButton.setBackgroundResource(R.drawable.bg_consult_selected);
             inPersonButton.setBackgroundResource(R.drawable.bg_consult_unselected);
-            Toast.makeText(this, R.string.doctor_profile_video_call_selected, Toast.LENGTH_SHORT).show();
         });
 
         inPersonButton.setOnClickListener(v -> {
             inPersonButton.setBackgroundResource(R.drawable.bg_consult_selected);
             videoCallButton.setBackgroundResource(R.drawable.bg_consult_unselected);
-            Toast.makeText(this, R.string.doctor_profile_in_person_selected, Toast.LENGTH_SHORT).show();
         });
 
         confirmButton.setOnClickListener(v -> {
+            if (selectedDate == null) {
+                Toast.makeText(this, "Please select a date.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (selectedTime == null) {
+                Toast.makeText(this, "Please select a time slot.", Toast.LENGTH_SHORT).show();
+                return;
+            }
             Toast.makeText(this,
-                    getString(R.string.doctor_profile_confirmation, selectedDate, selectedTime),
+                    "Appointment confirmed: " + selectedDate + " at " + selectedTime,
                     Toast.LENGTH_LONG).show();
-            // TODO: Save appointment to database
+            // TODO: Save to Firebase
             finish();
         });
     }

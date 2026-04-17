@@ -291,11 +291,12 @@
 
             <!-- Available Slots -->
             <TextView
+                android:id="@+id/available_slots_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="20dp"
-                android:text="Available Slots - Feb 26"
+                android:text="Available Slots"
                 android:textColor="@color/text_primary"
                 android:textSize="14sp"
                 android:textStyle="bold" />
