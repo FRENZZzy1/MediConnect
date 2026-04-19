@@ -16,12 +16,17 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class DoctorProfileActivity extends AppCompatActivity {
 
@@ -34,7 +39,10 @@ public class DoctorProfileActivity extends AppCompatActivity {
     private LinearLayout calendarContainer, timeSlotsContainer;
 
     private String selectedDate = null;
+    private String selectedDateDisplay = null;
     private String selectedTime = null;
+    private String selectedConsultationType = "video";
+    private String doctorUid;
     private List<String> availableDaysList = new ArrayList<>();
     private String consultationHoursRaw = "";
     private View lastSelectedDayView = null;
@@ -69,7 +77,7 @@ public class DoctorProfileActivity extends AppCompatActivity {
     }
 
     private void loadDoctorDataFromFirebase() {
-        String doctorUid = getIntent().getStringExtra("doctor_uid");
+        doctorUid = getIntent().getStringExtra("doctor_uid");
 
         if (doctorUid == null || doctorUid.isEmpty()) {
             Toast.makeText(this, "Doctor not found.", Toast.LENGTH_SHORT).show();
@@ -207,9 +215,12 @@ public class DoctorProfileActivity extends AppCompatActivity {
                 dayView.setEnabled(true);
 
                 final String dateLabel = fullDateFormat.format(day.getTime());
+                final String isoDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                        .format(day.getTime());
                 final Calendar finalDay = day;
                 dayView.setOnClickListener(v -> {
-                    selectedDate = dateLabel;
+                    selectedDate = isoDate;
+                    selectedDateDisplay = dateLabel;
                     selectedTime = null;
 
                     // Reset previous selection
@@ -359,11 +370,13 @@ public class DoctorProfileActivity extends AppCompatActivity {
         backButton.setOnClickListener(v -> finish());
 
         videoCallButton.setOnClickListener(v -> {
+            selectedConsultationType = "video";
             videoCallButton.setBackgroundResource(R.drawable.bg_consult_selected);
             inPersonButton.setBackgroundResource(R.drawable.bg_consult_unselected);
         });
 
         inPersonButton.setOnClickListener(v -> {
+            selectedConsultationType = "in_person";
             inPersonButton.setBackgroundResource(R.drawable.bg_consult_selected);
             videoCallButton.setBackgroundResource(R.drawable.bg_consult_unselected);
         });
@@ -377,11 +390,70 @@ public class DoctorProfileActivity extends AppCompatActivity {
                 Toast.makeText(this, "Please select a time slot.", Toast.LENGTH_SHORT).show();
                 return;
             }
-            Toast.makeText(this,
-                    "Appointment confirmed: " + selectedDate + " at " + selectedTime,
-                    Toast.LENGTH_LONG).show();
-            // TODO: Save to Firebase
-            finish();
+            saveAppointmentToFirestore();
         });
+    }
+
+    private void saveAppointmentToFirestore() {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) {
+            Toast.makeText(this, "Please login first.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (doctorUid == null || doctorUid.isEmpty()) {
+            Toast.makeText(this, "Doctor not found.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        confirmButton.setEnabled(false);
+
+        FirebaseDatabase.getInstance()
+                .getReference("Users")
+                .child(currentUser.getUid())
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    String first = snapshot.child("firstName").getValue(String.class);
+                    String last = snapshot.child("lastName").getValue(String.class);
+                    String patientName = ((first != null ? first : "") + " " + (last != null ? last : "")).trim();
+                    if (patientName.isEmpty()) patientName = currentUser.getUid();
+
+                    writeAppointment(currentUser.getUid(), patientName);
+                })
+                .addOnFailureListener(e -> writeAppointment(currentUser.getUid(), currentUser.getUid()));
+    }
+
+    private void writeAppointment(String patientId, String patientName) {
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+        String appointmentDocId = firestore.collection("appointments").document().getId();
+        String appointmentType = "video".equals(selectedConsultationType)
+                ? "Online Consultation"
+                : "Consultation";
+
+        Map<String, Object> appointment = new HashMap<>();
+        appointment.put("appointmentId", appointmentDocId);
+        appointment.put("doctorId", doctorUid);
+        appointment.put("patientId", patientId);
+        appointment.put("patientName", patientName);
+        appointment.put("date", selectedDate);
+        appointment.put("time", selectedTime);
+        appointment.put("status", "pending");
+        appointment.put("type", appointmentType);
+        appointment.put("notes", "");
+
+        firestore.collection("appointments")
+                .document(appointmentDocId)
+                .set(appointment)
+                .addOnSuccessListener(unused -> {
+                    String displayDate = selectedDateDisplay != null ? selectedDateDisplay : selectedDate;
+                    Toast.makeText(this,
+                            "Appointment requested for " + displayDate + " at " + selectedTime + ". Waiting for doctor confirmation.",
+                            Toast.LENGTH_LONG).show();
+                    finish();
+                })
+                .addOnFailureListener(e -> {
+                    confirmButton.setEnabled(true);
+                    Toast.makeText(this, "Failed to save appointment: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                });
     }
 }
