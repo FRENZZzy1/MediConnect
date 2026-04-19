@@ -3,6 +3,11 @@ plugins {
     alias(libs.plugins.google.gms.google.services)
 }
 
+configurations.configureEach {
+    // MMKV 2.x requires 64-bit app process; force 1.3.x for 32-bit devices.
+    resolutionStrategy.force("com.tencent:mmkv:1.3.14")
+}
+
 android {
     namespace = "com.example.mediconnect"
     compileSdk = 36        // ← simple, no block
@@ -49,7 +54,7 @@ dependencies {
     implementation(libs.firebase.database)
     implementation(libs.legacy.support.v4)
     implementation(libs.cardview)
-    implementation("im.zego:zego_uikit_prebuilt_call_android:+")
+    implementation("im.zego:zego_uikit_prebuilt_call_android:3.0.4")
     implementation(libs.gridlayout)
     implementation(libs.firebase.firestore)
     testImplementation(libs.junit)
