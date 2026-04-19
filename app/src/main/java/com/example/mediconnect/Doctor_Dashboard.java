@@ -404,12 +404,23 @@ public class Doctor_Dashboard extends AppCompatActivity {
         bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.nav_home)     return true;
-            if (id == R.id.nav_schedule) { return true; }
+            if (id == R.id.nav_schedule) {
+                Schedules();
+                return true; }
             if (id == R.id.nav_patients) { return true; }
             if (id == R.id.nav_profile)  { return true; }
             return false;
         });
     }
+
+
+    public void Schedules() {
+        Intent intent = new Intent(this, ScheduleActivity.class);
+        startActivity(intent);
+    }
+
+
+
 
     // ─── Lifecycle ────────────────────────────────────────────────────────────
 

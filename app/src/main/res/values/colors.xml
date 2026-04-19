@@ -76,4 +76,8 @@
 
     <color name="accent_coral">#FF5722</color>
     <color name="primary_teal_50">#E0F7FA</color>
+
+    <color name="teal_primary">#0E7490</color>
+    <color name="tab_inactive_bg">#F1F5F9</color>
+    <color name="tab_inactive_text">#64748B</color>
 </resources>
