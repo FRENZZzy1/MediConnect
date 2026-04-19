@@ -47,6 +47,10 @@ public class Doctor_Dashboard extends AppCompatActivity {
     private View layoutEmptySchedule;
     private RecyclerView rvAppointments;
     private BottomNavigationView bottomNav;
+    private com.example.mediconnect.PendingRequestsAdapter pendingAdapter;
+    private final List<AppointmentItem> pendingList = new ArrayList<>();
+    private View layoutEmptyPending;
+    private RecyclerView rvPendingRequests;
 
     // ── Firebase ───────────────────────────────────────────────────────────────
     private FirebaseAuth mAuth;
@@ -74,6 +78,7 @@ public class Doctor_Dashboard extends AppCompatActivity {
         loadDashboardStats();
         loadTodaySchedule();
         setupAvailabilityToggle();
+        loadPendingRequests();
 
         tvViewAll.setOnClickListener(v -> {});
 
@@ -99,6 +104,18 @@ public class Doctor_Dashboard extends AppCompatActivity {
         rvAppointments.setLayoutManager(new LinearLayoutManager(this));
         rvAppointments.setAdapter(scheduleAdapter);
         rvAppointments.setNestedScrollingEnabled(false);
+
+
+        layoutEmptyPending = findViewById(R.id.layoutEmptyPending);
+        rvPendingRequests  = findViewById(R.id.rvPendingRequests);
+
+        pendingAdapter = new com.example.mediconnect.PendingRequestsAdapter(pendingList, (item, position, action) -> {
+            String newStatus = "accept".equals(action) ? "confirmed" : "cancelled";
+            updateAppointmentStatus(item.appointmentId, newStatus, position);
+        });
+        rvPendingRequests.setLayoutManager(new LinearLayoutManager(this));
+        rvPendingRequests.setAdapter(pendingAdapter);
+        rvPendingRequests.setNestedScrollingEnabled(false);
     }
 
     // ─── Load doctor name then init Zego ──────────────────────────────────────
@@ -192,6 +209,7 @@ public class Doctor_Dashboard extends AppCompatActivity {
         firestore.collection("appointments")
                 .whereEqualTo("doctorId", user.getUid())
                 .whereEqualTo("date", todayDate)
+                .whereEqualTo("status", "confirmed")   // ← ADD THIS FILTER
                 .orderBy("time", Query.Direction.ASCENDING)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
@@ -291,6 +309,80 @@ public class Doctor_Dashboard extends AppCompatActivity {
         });
     }
 
+
+    // ─── Load Pending Requests ────────────────────────────────────────────────
+
+    private void loadPendingRequests() {
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user == null) return;
+
+        firestore.collection("appointments")
+                .whereEqualTo("doctorId", user.getUid())
+                .whereEqualTo("status", "pending")
+                .orderBy("date", Query.Direction.ASCENDING)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    pendingList.clear();
+
+                    if (querySnapshot.isEmpty()) {
+                        layoutEmptyPending.setVisibility(View.VISIBLE);
+                        rvPendingRequests.setVisibility(View.GONE);
+                        return;
+                    }
+
+                    layoutEmptyPending.setVisibility(View.GONE);
+                    rvPendingRequests.setVisibility(View.VISIBLE);
+
+                    for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                        AppointmentItem item = new AppointmentItem();
+                        item.appointmentId = doc.getString("appointmentId");
+                        item.patientId     = doc.getString("patientId");
+                        item.patientName   = doc.getString("patientName");
+                        item.time          = doc.getString("time");
+                        item.type          = doc.getString("type");
+                        item.status        = doc.getString("status");
+                        item.notes         = doc.getString("notes");
+                        item.date          = doc.getString("date");
+
+                        pendingList.add(item);
+                        pendingAdapter.notifyItemInserted(pendingList.size() - 1);
+                    }
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(this,
+                                "Failed to load requests: " + e.getMessage(),
+                                Toast.LENGTH_SHORT).show());
+    }
+
+    private void updateAppointmentStatus(String appointmentId, String newStatus, int position) {
+        firestore.collection("appointments")
+                .document(appointmentId)
+                .update("status", newStatus)
+                .addOnSuccessListener(unused -> {
+                    pendingList.remove(position);
+                    pendingAdapter.notifyItemRemoved(position);
+                    pendingAdapter.notifyItemRangeChanged(position, pendingList.size());
+
+                    if (pendingList.isEmpty()) {
+                        layoutEmptyPending.setVisibility(View.VISIBLE);
+                        rvPendingRequests.setVisibility(View.GONE);
+                    }
+
+                    String msg = "confirmed".equals(newStatus)
+                            ? "Appointment confirmed!" : "Appointment declined.";
+                    Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+
+                    // Refresh stats + today's schedule
+                    loadDashboardStats();
+                    loadTodaySchedule();
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(this,
+                                "Failed to update: " + e.getMessage(),
+                                Toast.LENGTH_SHORT).show());
+    }
+
+
     private void updateAvailabilityUI(boolean isAvailable) {
         if (isAvailable) {
             tvAvailabilityLabel.setText("Accepting new patients");
@@ -300,6 +392,10 @@ public class Doctor_Dashboard extends AppCompatActivity {
             viewStatusDot.setBackgroundResource(R.drawable.circle_status_inactive);
         }
     }
+
+
+
+
 
     // ─── Bottom Navigation ────────────────────────────────────────────────────
 
