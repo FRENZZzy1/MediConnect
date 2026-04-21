@@ -22,6 +22,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import android.content.Intent;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 public class ScheduleActivity extends AppCompatActivity {
 
     // ── Views ──────────────────────────────────────────────────────────────────
@@ -63,6 +66,7 @@ public class ScheduleActivity extends AppCompatActivity {
 
         // Default: today
         selectTab(tabToday, sdf.format(new Date()));
+        setupBottomNav();
     }
 
     // ── Bind ──────────────────────────────────────────────────────────────────
@@ -201,4 +205,23 @@ public class ScheduleActivity extends AppCompatActivity {
                             Toast.LENGTH_SHORT).show();
                 });
     }
+
+    private void setupBottomNav() {
+        BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
+        bottomNav.setSelectedItemId(R.id.nav_schedule); // highlight Schedule tab
+        bottomNav.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_schedule) return true; // already here
+            if (id == R.id.nav_home) {
+                startActivity(new Intent(this, Doctor_Dashboard.class));
+                finish();
+                return true;
+            }
+            if (id == R.id.nav_patients) { return true; }
+            if (id == R.id.nav_profile)  { return true; }
+            return false;
+        });
+    }
+
+
 }

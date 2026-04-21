@@ -187,14 +187,19 @@ public class Doctor_Dashboard extends AppCompatActivity {
                 .whereEqualTo("doctorId", uid)
                 .get()
                 .addOnSuccessListener(q -> {
+                    android.util.Log.d("PATIENT_COUNT", "Documents found: " + q.size());
                     Set<String> patientIds = new HashSet<>();
                     for (DocumentSnapshot doc : q.getDocuments()) {
                         String pid = doc.getString("patientId");
                         if (pid != null) patientIds.add(pid);
                     }
+                    android.util.Log.d("PATIENT_COUNT", "Unique patients: " + patientIds.size());
                     tvPatientCount.setText(String.valueOf(patientIds.size()));
                 })
-                .addOnFailureListener(e -> tvPatientCount.setText("0"));
+                .addOnFailureListener(e -> {
+                    android.util.Log.e("PATIENT_COUNT", "ERROR: " + e.getMessage());
+                    tvPatientCount.setText("0");
+                });
     }
 
     // ─── Load Today's Schedule ────────────────────────────────────────────────

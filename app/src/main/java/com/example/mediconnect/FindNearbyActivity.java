@@ -200,7 +200,7 @@ public class FindNearbyActivity extends AppCompatActivity {
 
         Request request = new Request.Builder()
                 .url(url)
-                .header("Accept", "application/json")
+                .header("User-Agent", "MediConnectApp/1.0 (student project)")
                 .build();
 
         httpClient.newCall(request).enqueue(new Callback() {
@@ -223,8 +223,37 @@ public class FindNearbyActivity extends AppCompatActivity {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 if (response.body() == null) return;
+
                 String json = response.body().string();
-                runOnUiThread(() -> parseClinicsAndAddMarkers(json));
+
+                // 🔥 ALWAYS LOG RESPONSE
+                Log.d(TAG, "Response received");
+
+                runOnUiThread(() -> {
+
+                    // 🚨 If NOT JSON → log real error
+                    if (!response.isSuccessful() || json.trim().startsWith("<")) {
+
+                        logServerError(response, json);
+
+                        if (retryCount < MAX_RETRIES) {
+                            retryCount++;
+                            Toast.makeText(FindNearbyActivity.this,
+                                    "Server busy... retrying (" + retryCount + "/" + MAX_RETRIES + ")",
+                                    Toast.LENGTH_SHORT).show();
+
+                            mapView.postDelayed(() ->
+                                    searchNearbyClinics(currentLat, currentLng), 3000);
+                        } else {
+                            Toast.makeText(FindNearbyActivity.this,
+                                    "Server unavailable. Check Logcat.",
+                                    Toast.LENGTH_LONG).show();
+                        }
+
+                    } else {
+                        parseClinicsAndAddMarkers(json);
+                    }
+                });
             }
         });
     }
@@ -313,30 +342,71 @@ public class FindNearbyActivity extends AppCompatActivity {
     // ─────────────────────────────────────────────────────────
 
     private void getRoute(double fromLat, double fromLng, double toLat, double toLng) {
-        // OSRM expects: lng,lat order
+
         String url = "https://router.project-osrm.org/route/v1/driving/"
                 + fromLng + "," + fromLat + ";"
                 + toLng + "," + toLat
                 + "?overview=full&geometries=geojson";
 
-        Log.d(TAG, "OSRM URL: " + url);
-
-        Request request = new Request.Builder().url(url).build();
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
 
         httpClient.newCall(request).enqueue(new Callback() {
+
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                Log.e(TAG, "Routing failed: " + e.getMessage());
+                Log.e(TAG, "Routing network failure", e);
+
                 runOnUiThread(() ->
                         Toast.makeText(FindNearbyActivity.this,
-                                "Routing failed: check internet.", Toast.LENGTH_LONG).show());
+                                "Routing failed: no internet or server unreachable",
+                                Toast.LENGTH_LONG).show());
             }
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                if (response.body() == null) return;
+
+                if (response.body() == null) {
+                    runOnUiThread(() ->
+                            Toast.makeText(FindNearbyActivity.this,
+                                    "Empty routing response",
+                                    Toast.LENGTH_SHORT).show());
+                    return;
+                }
+
                 String json = response.body().string();
-                runOnUiThread(() -> drawRoute(json));
+
+                runOnUiThread(() -> {
+
+                    // 🔥 IMPORTANT FIX
+                    if (!response.isSuccessful()) {
+                        Log.e(TAG, "HTTP Error: " + response.code());
+                        Toast.makeText(FindNearbyActivity.this,
+                                "Routing server error: " + response.code(),
+                                Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    try {
+                        JSONObject root = new JSONObject(json);
+
+                        if (!root.optString("code").equals("Ok")) {
+                            Toast.makeText(FindNearbyActivity.this,
+                                    "No route found",
+                                    Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        drawRoute(json);
+
+                    } catch (Exception e) {
+                        Log.e(TAG, "Invalid routing JSON", e);
+                        Toast.makeText(FindNearbyActivity.this,
+                                "Routing parse error",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
     }
@@ -425,6 +495,30 @@ public class FindNearbyActivity extends AppCompatActivity {
                         .setNegativeButton("Cancel", (d, w) -> finish())
                         .show();
             }
+        }
+    }
+
+    private void logServerError(Response response, String body) {
+        try {
+            // Log HTTP status
+            Log.e(TAG, "🔴 HTTP Code: " + response.code());
+            Log.e(TAG, "🔴 Message: " + response.message());
+
+            // Log headers (very useful for rate limit info)
+            Log.e(TAG, "🔴 Headers:\n" + response.headers().toString());
+
+            // Log raw response body (THIS is what you need)
+            Log.e(TAG, "🔴 Raw Response:\n" + body);
+
+            // Optional: detect common errors
+            if (body.contains("Too Many Requests")) {
+                Log.e(TAG, "⚠️ Rate limit exceeded (429)");
+            } else if (body.contains("server load")) {
+                Log.e(TAG, "⚠️ Server overloaded");
+            }
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error logging server response", e);
         }
     }
 
