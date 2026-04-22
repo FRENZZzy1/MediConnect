@@ -16,6 +16,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MediConnect">
         <activity
+            android:name=".dialog_change_password"
+            android:exported="false" />
+        <activity
+            android:name=".DoctorPersonalProfile"
+            android:exported="false" />
+        <activity
             android:name=".PatientListActivity"
             android:exported="false" />
         <activity

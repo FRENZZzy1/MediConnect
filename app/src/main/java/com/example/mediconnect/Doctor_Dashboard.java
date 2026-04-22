@@ -415,7 +415,9 @@ public class Doctor_Dashboard extends AppCompatActivity {
             if (id == R.id.nav_patients) {
                 PatientList();
             return true; }
-            if (id == R.id.nav_profile)  { return true; }
+            if (id == R.id.nav_profile)  {
+                Profile();
+                return true; }
             return false;
         });
     }
@@ -428,6 +430,11 @@ public class Doctor_Dashboard extends AppCompatActivity {
 
     public void PatientList() {
         Intent intent = new Intent(this, PatientListActivity.class);
+        startActivity(intent);
+    }
+
+    public void Profile() {
+        Intent intent = new Intent(this, DoctorPersonalProfile.class);
         startActivity(intent);
     }
 

@@ -211,17 +211,27 @@ public class ScheduleActivity extends AppCompatActivity {
         bottomNav.setSelectedItemId(R.id.nav_schedule); // highlight Schedule tab
         bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
-            if (id == R.id.nav_schedule) return true; // already here
+            if (id == R.id.nav_profile)  return true;
             if (id == R.id.nav_home) {
                 startActivity(new Intent(this, Doctor_Dashboard.class));
                 finish();
                 return true;
             }
-            if (id == R.id.nav_patients) { return true; }
-            if (id == R.id.nav_profile)  { return true; }
+            if (id == R.id.nav_schedule) {
+                startActivity(new Intent(this, ScheduleActivity.class));
+                finish();
+                return true;
+            }
+            if (id == R.id.nav_patients) {
+                startActivity(new Intent(this, PatientListActivity.class));
+                finish();
+                return true;
+            }
             return false;
         });
     }
+
+
 
 
 }
