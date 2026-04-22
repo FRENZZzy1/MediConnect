@@ -39,18 +39,39 @@ public class AppointmentsAdapter extends RecyclerView.Adapter<AppointmentsAdapte
         Appointment appointment = appointments.get(position);
 
         // Doctor name
-        holder.doctorNameText.setText(appointment.getDoctorName() != null ?
-                appointment.getDoctorName() : "Doctor");
+        if (holder.doctorNameText != null) {
+            String name = appointment.getDoctorName();
+            if (name != null && !name.isEmpty()) {
+                // Remove "Dr. " if already present
+                if (name.startsWith("Dr. ")) {
+                    holder.doctorNameText.setText(name);
+                } else {
+                    holder.doctorNameText.setText("Dr. " + name);
+                }
+            } else {
+                holder.doctorNameText.setText("Doctor");
+            }
+        }
 
-        // Specialty & Hospital
-        String specialtyHospital = "";
-        if (appointment.getDoctorSpecialty() != null) {
-            specialtyHospital = appointment.getDoctorSpecialty();
+        // Specialty + Hospital combined
+        if (holder.specialtyText != null) {
+            String specialty = appointment.getDoctorSpecialty();
+            String hospital = appointment.getDoctorHospital();
+
+            String combined = "";
+            if (specialty != null && !specialty.isEmpty()) {
+                combined = specialty;
+            }
+            if (hospital != null && !hospital.isEmpty()) {
+                if (!combined.isEmpty()) {
+                    combined += " • " + hospital;
+                } else {
+                    combined = hospital;
+                }
+            }
+
+            holder.specialtyText.setText(combined.isEmpty() ? "Specialist" : combined);
         }
-        if (appointment.getDoctorHospital() != null) {
-            specialtyHospital += " • " + appointment.getDoctorHospital();
-        }
-        holder.specialtyText.setText(specialtyHospital);
 
         // Date & Time
         holder.dateTimeText.setText(appointment.getFormattedDate() + " • " + appointment.getTime());

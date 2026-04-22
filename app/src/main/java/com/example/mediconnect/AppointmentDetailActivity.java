@@ -71,9 +71,19 @@ public class AppointmentDetailActivity extends AppCompatActivity {
 
     private void populateData(String doctorName, String specialty, String hospital,
                               String date, String time, String type, String status, String notes) {
-        doctorNameText.setText(doctorName != null ? doctorName : "Doctor");
-        specialtyText.setText(specialty != null ? specialty : "");
-        hospitalText.setText(hospital != null ? hospital : "");
+        // Format doctor name with "Dr. " prefix
+        String formattedName = doctorName;
+        if (doctorName != null && !doctorName.isEmpty()) {
+            if (!doctorName.startsWith("Dr.")) {
+                formattedName = "Dr. " + doctorName;
+            }
+        } else {
+            formattedName = "Doctor";
+        }
+
+        doctorNameText.setText(formattedName);
+        specialtyText.setText(specialty != null && !specialty.isEmpty() ? specialty : "");
+        hospitalText.setText(hospital != null && !hospital.isEmpty() ? hospital : "");
         dateText.setText(date != null ? date : "");
         timeText.setText(time != null ? time : "");
         typeText.setText(type != null ? type : "Consultation");

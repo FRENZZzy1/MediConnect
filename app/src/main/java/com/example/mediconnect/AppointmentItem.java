@@ -9,6 +9,9 @@ public class AppointmentItem {
     public String appointmentId;
     public String date;
     public String doctorId;
+    public String doctorName;
+    public String specialty;
+    public String hospital;
     public String notes;
     public String patientId;
     public String patientName;

@@ -35,19 +35,35 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ViewHo
         // ── Time ──────────────────────────────────────────────────────────────
         h.tvTime.setText(item.time != null ? item.time : "--:--");
 
-        // ── Patient name ──────────────────────────────────────────────────────
-        String name = (item.patientName != null && !item.patientName.isEmpty())
-                ? item.patientName : "Unknown Patient";
-        h.tvPatientName.setText(name);
+        // ── Doctor name (instead of patient) ────────────────────────────────────
+        String doctorName = (item.doctorName != null && !item.doctorName.isEmpty())
+                ? item.doctorName : "Dr. " + ((item.patientName != null && !item.patientName.isEmpty())
+                ? item.patientName : "Unknown");
+        h.tvDoctorName.setText(doctorName);
+
+        // ── Doctor Specialty ───────────────────────────────────────────────────
+        if (h.tvDoctorSpecialty != null) {
+            String specialty = (item.specialty != null && !item.specialty.isEmpty())
+                    ? item.specialty : "Specialist";
+            h.tvDoctorSpecialty.setText(specialty);
+        }
 
         // ── Initials avatar ───────────────────────────────────────────────────
-        String initials = getInitials(name);
+        String initials = getInitials(doctorName);
         h.tvInitials.setText(initials);
 
         // ── Appointment type chip ─────────────────────────────────────────────
         String type = item.type != null ? item.type : "Consultation";
         h.tvType.setText(type);
         setTypeChipColor(h.tvType, type);
+
+        // ── Hospital ───────────────────────────────────────────────────────────
+        if (h.tvHospital != null) {
+            String hospital = (item.hospital != null && !item.hospital.isEmpty())
+                    ? item.hospital : "";
+            h.tvHospital.setText(hospital);
+            h.tvHospital.setVisibility(hospital.isEmpty() ? View.GONE : View.VISIBLE);
+        }
 
         // ── Notes ─────────────────────────────────────────────────────────────
         if (item.notes != null && !item.notes.isEmpty()) {
@@ -108,18 +124,20 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ViewHo
     // ── ViewHolder ────────────────────────────────────────────────────────────
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvTime, tvPatientName, tvInitials, tvType, tvNotes, tvPositionNumber;
+        TextView tvTime, tvDoctorName, tvDoctorSpecialty, tvInitials, tvType, tvNotes, tvHospital, tvPositionNumber;
         View     viewConnector;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvTime           = itemView.findViewById(R.id.tvTime);
-            tvPatientName    = itemView.findViewById(R.id.tvPatientName);
-            tvInitials       = itemView.findViewById(R.id.tvInitials);
-            tvType           = itemView.findViewById(R.id.tvType);
-            tvNotes          = itemView.findViewById(R.id.tvNotes);
-            tvPositionNumber = itemView.findViewById(R.id.tvPositionNumber);
-            viewConnector    = itemView.findViewById(R.id.viewConnector);
+            tvTime             = itemView.findViewById(R.id.tvTime);
+            tvDoctorName       = itemView.findViewById(R.id.tvDoctorName);
+            tvDoctorSpecialty  = itemView.findViewById(R.id.tvDoctorSpecialty);
+            tvInitials         = itemView.findViewById(R.id.tvInitials);
+            tvType             = itemView.findViewById(R.id.tvType);
+            tvNotes            = itemView.findViewById(R.id.tvNotes);
+            tvHospital         = itemView.findViewById(R.id.tvHospital);
+            tvPositionNumber   = itemView.findViewById(R.id.tvPositionNumber);
+            viewConnector      = itemView.findViewById(R.id.viewConnector);
         }
     }
 }
