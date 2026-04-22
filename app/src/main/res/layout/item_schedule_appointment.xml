@@ -108,14 +108,27 @@
                     android:orientation="vertical"
                     android:layout_marginStart="10dp">
 
+                    <!-- Doctor Name -->
                     <TextView
-                        android:id="@+id/tvPatientName"
+                        android:id="@+id/tvDoctorName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Frenz Allen"
+                        android:text="Dr. Juan"
                         android:textColor="#1E293B"
                         android:textSize="14sp"
                         android:textStyle="bold"
+                        android:maxLines="1"
+                        android:ellipsize="end"/>
+
+                    <!-- Doctor Specialty -->
+                    <TextView
+                        android:id="@+id/tvDoctorSpecialty"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Cardiologist"
+                        android:textColor="#64748B"
+                        android:textSize="11sp"
+                        android:layout_marginTop="2dp"
                         android:maxLines="1"
                         android:ellipsize="end"/>
 
@@ -147,17 +160,38 @@
                 android:background="#F1F5F9"/>
 
             <!-- Notes row (only shown when notes exist) -->
-            <TextView
-                android:id="@+id/tvNotes"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text=""
-                android:textColor="#64748B"
-                android:textSize="12sp"
-                android:drawablePadding="6dp"
-                android:maxLines="2"
-                android:ellipsize="end"
-                android:visibility="gone"/>
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/tvHospital"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textColor="#64748B"
+                    android:textSize="11sp"
+                    android:maxLines="1"
+                    android:ellipsize="end"/>
+
+                <TextView
+                    android:id="@+id/tvNotes"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textColor="#64748B"
+                    android:textSize="12sp"
+                    android:drawablePadding="6dp"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:visibility="gone"/>
+
+            </LinearLayout>
 
             <!-- Status badge row -->
             <LinearLayout

@@ -26,6 +26,7 @@
     <color name="text_primary">#212121</color>
     <color name="text_secondary">#757575</color>
     <color name="text_tertiary">#9E9E9E</color>
+    <color name="text_white">#FFFFFF</color>
 
     <!-- ─── Quick Action Colors ─── -->
     <color name="action_video">#1ABCD6</color>

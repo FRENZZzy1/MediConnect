@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -155,13 +156,42 @@ public class AppointmentsFragment extends Fragment {
     }
 
     private void fetchDoctorDetails(Appointment appointment) {
-        db.collection("doctors").document(appointment.getDoctorId())
+        String doctorId = appointment.getDoctorId();
+
+        // Log for debugging
+        android.util.Log.d("AppointmentsFragment", "Fetching doctor details for: " + doctorId);
+
+        if (doctorId == null || doctorId.isEmpty()) {
+            // If no doctorId, still add appointment but with placeholder
+            appointment.setDoctorName("Doctor");
+            appointment.setDoctorSpecialty("Specialist");
+            appointmentList.add(appointment);
+            appointmentsAdapter.notifyDataSetChanged();
+            return;
+        }
+
+        // Fetch from Realtime Database (where doctors are stored)
+        FirebaseDatabase.getInstance()
+                .getReference("Doctors")
+                .child(doctorId)
                 .get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        appointment.setDoctorName(documentSnapshot.getString("name"));
-                        appointment.setDoctorSpecialty(documentSnapshot.getString("specialty"));
-                        appointment.setDoctorHospital(documentSnapshot.getString("hospital"));
+                .addOnSuccessListener(snapshot -> {
+                    if (snapshot.exists()) {
+                        String name = snapshot.child("fullName").getValue(String.class);
+                        String specialty = snapshot.child("specialization").getValue(String.class);
+                        String location = snapshot.child("clinicName").getValue(String.class);
+
+                        // Log for debugging
+                        android.util.Log.d("AppointmentsFragment", "Doctor found - Name: " + name + ", Specialty: " + specialty);
+                        
+                        appointment.setDoctorName(name);
+                        appointment.setDoctorSpecialty(specialty);
+                        appointment.setDoctorHospital(location);
+                    } else {
+                        // Doctor document doesn't exist
+                        android.util.Log.w("AppointmentsFragment", "Doctor document not found for ID: " + doctorId);
+                        appointment.setDoctorName("Doctor");
+                        appointment.setDoctorSpecialty("Specialist");
                     }
                     appointmentList.add(appointment);
                     appointmentsAdapter.notifyDataSetChanged();
@@ -171,6 +201,9 @@ public class AppointmentsFragment extends Fragment {
                     }
                 })
                 .addOnFailureListener(e -> {
+                    android.util.Log.e("AppointmentsFragment", "Error fetching doctor: " + e.getMessage());
+                    appointment.setDoctorName("Doctor");
+                    appointment.setDoctorSpecialty("Specialist");
                     appointmentList.add(appointment);
                     appointmentsAdapter.notifyDataSetChanged();
                 });
