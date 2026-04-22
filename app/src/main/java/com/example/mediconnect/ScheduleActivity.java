@@ -211,7 +211,9 @@ public class ScheduleActivity extends AppCompatActivity {
         bottomNav.setSelectedItemId(R.id.nav_schedule); // highlight Schedule tab
         bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
-            if (id == R.id.nav_profile)  return true;
+            if (id == R.id.nav_profile)  {
+                startActivity(new Intent(this, DoctorPersonalProfile.class));
+                return true;}
             if (id == R.id.nav_home) {
                 startActivity(new Intent(this, Doctor_Dashboard.class));
                 finish();
@@ -223,7 +225,7 @@ public class ScheduleActivity extends AppCompatActivity {
                 return true;
             }
             if (id == R.id.nav_patients) {
-                startActivity(new Intent(this, PatientListActivity.class));
+
                 finish();
                 return true;
             }
