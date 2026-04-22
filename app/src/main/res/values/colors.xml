@@ -80,4 +80,19 @@
     <color name="teal_primary">#0E7490</color>
     <color name="tab_inactive_bg">#F1F5F9</color>
     <color name="tab_inactive_text">#64748B</color>
+
+
+
+
+   <!--DOCTOR SIDE-->
+    <color name="background">#F0F4F8</color>
+    <color name="cardBackground">#FFFFFF</color>
+    <color name="textPrimary">#000000</color>
+    <color name="textSecondary">#666666</color>
+
+    <color name="startcolorDashboard">#044A5A</color>
+    <color name="centertcolorDashboard">#0891B2</color>
+    <color name="endcolorDashboard">#06B6D4</color>
+
+
 </resources>

@@ -80,5 +80,19 @@
 
     <color name="accent_coral">#FF7043</color>
     <color name="primary_teal_50">#1A3A42</color>
+
+
+    <!--DOCTOR SIDE-->
+    <color name="background">#121212</color>
+    <color name="cardBackground">#1E1E1E</color>
+    <color name="textPrimary">#FFFFFF</color>
+    <color name="textSecondary">#B0B0B0</color>
+
+
+    <color name="startcolorDashboard">#022B36</color>
+    <color name="centertcolorDashboard">#0A4D5E</color>
+    <color name="endcolorDashboard">#12738A</color>
+
+
 </resources>
 
