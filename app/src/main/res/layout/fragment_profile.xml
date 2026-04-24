@@ -1,25 +1,409 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.core.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical">
+    android:background="@color/dashboard_bg"
+    android:clipToPadding="false"
+    android:paddingBottom="24dp">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="My Profile"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:textColor="@color/text_primary" />
+        android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Coming soon..."
-        android:textSize="16sp"
-        android:textColor="@color/text_secondary"
-        android:layout_marginTop="8dp" />
+        <!-- ══ HEADER ══ -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_header_rounded_bottom"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingTop="36dp"
+            android:paddingBottom="32dp"
+            android:paddingHorizontal="24dp">
 
-</LinearLayout>
+            <FrameLayout
+                android:layout_width="88dp"
+                android:layout_height="88dp"
+                android:background="@drawable/circle_avatar_bg">
+                <TextView
+                    android:id="@+id/tv_avatar_initials"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="…"
+                    android:textColor="@color/white"
+                    android:textSize="28sp"
+                    android:textStyle="bold" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/tv_full_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="Loading…"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_email"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textColor="#B3FFFFFF"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/btn_edit_profile_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/pill_white_translucent"
+                android:paddingHorizontal="22dp"
+                android:paddingVertical="8dp"
+                android:text="Edit Profile"
+                android:textColor="@color/white"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:clickable="true"
+                android:focusable="true" />
+        </LinearLayout>
+
+        <!-- ══ LOADING SPINNER ══ -->
+        <FrameLayout
+            android:id="@+id/loading_overlay"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_marginTop="20dp"
+            android:visibility="visible">
+            <ProgressBar
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_gravity="center"
+                android:indeterminateTint="@color/primary_teal" />
+        </FrameLayout>
+
+        <!-- ══ STATS ROW ══ -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/card_stats"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="4dp"
+            android:visibility="gone"
+            app:cardBackgroundColor="@color/card_bg"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingVertical="18dp">
+
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+                    <TextView android:id="@+id/tv_stat_appointments"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="0" android:textColor="@color/primary_teal"
+                        android:textSize="22sp" android:textStyle="bold" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp" android:text="Total"
+                        android:textColor="@color/text_secondary" android:textSize="12sp" />
+                </LinearLayout>
+
+                <View android:layout_width="1dp" android:layout_height="42dp"
+                    android:layout_gravity="center_vertical" android:background="@color/divider" />
+
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+                    <TextView android:id="@+id/tv_stat_doctors"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="0" android:textColor="@color/primary_teal"
+                        android:textSize="22sp" android:textStyle="bold" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp" android:text="Upcoming"
+                        android:textColor="@color/text_secondary" android:textSize="12sp" />
+                </LinearLayout>
+
+                <View android:layout_width="1dp" android:layout_height="42dp"
+                    android:layout_gravity="center_vertical" android:background="@color/divider" />
+
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+                    <TextView android:id="@+id/tv_stat_reports"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="0" android:textColor="@color/primary_teal"
+                        android:textSize="22sp" android:textStyle="bold" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp" android:text="Completed"
+                        android:textColor="@color/text_secondary" android:textSize="12sp" />
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- ══ PERSONAL INFO ══ -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/info_section"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="16dp"
+            android:visibility="gone"
+            app:cardBackgroundColor="@color/card_bg"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp">
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="16dp">
+
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Personal Info" android:textColor="@color/text_primary"
+                    android:textSize="15sp" android:textStyle="bold" />
+
+                <!-- Phone -->
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal" android:layout_marginTop="14dp">
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:text="Phone"
+                        android:textColor="@color/text_secondary" android:textSize="13sp" />
+                    <TextView android:id="@+id/tv_phone_value"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="—" android:textColor="@color/text_primary"
+                        android:textSize="13sp" android:textStyle="bold" />
+                </LinearLayout>
+                <View android:layout_width="match_parent" android:layout_height="1dp"
+                    android:layout_marginVertical="10dp" android:background="@color/divider" />
+
+                <!-- Date of Birth -->
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:text="Date of Birth"
+                        android:textColor="@color/text_secondary" android:textSize="13sp" />
+                    <TextView android:id="@+id/tv_dob_value"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="—" android:textColor="@color/text_primary"
+                        android:textSize="13sp" android:textStyle="bold" />
+                </LinearLayout>
+                <View android:layout_width="match_parent" android:layout_height="1dp"
+                    android:layout_marginVertical="10dp" android:background="@color/divider" />
+
+                <!-- Sex -->
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:text="Sex"
+                        android:textColor="@color/text_secondary" android:textSize="13sp" />
+                    <TextView android:id="@+id/tv_sex_value"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="—" android:textColor="@color/text_primary"
+                        android:textSize="13sp" android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- ══ APPEARANCE (DARK MODE TOGGLE) ══ -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="16dp"
+            app:cardBackgroundColor="@color/card_bg"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp">
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="16dp">
+
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Appearance" android:textColor="@color/text_primary"
+                    android:textSize="15sp" android:textStyle="bold" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp" android:text="Choose your preferred display mode"
+                    android:textColor="@color/text_secondary" android:textSize="13sp" />
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="46dp"
+                    android:layout_marginTop="16dp" android:background="@drawable/bg_toggle_track"
+                    android:orientation="horizontal" android:padding="4dp">
+
+                    <TextView android:id="@+id/btn_mode_system"
+                        android:layout_width="0dp" android:layout_height="match_parent"
+                        android:layout_weight="1" android:gravity="center" android:text="System"
+                        android:textSize="12sp" android:textStyle="bold"
+                        android:clickable="true" android:focusable="true" />
+
+                    <TextView android:id="@+id/btn_mode_light"
+                        android:layout_width="0dp" android:layout_height="match_parent"
+                        android:layout_weight="1" android:gravity="center" android:text="☀ Light"
+                        android:textSize="12sp" android:textStyle="bold"
+                        android:clickable="true" android:focusable="true" />
+
+                    <TextView android:id="@+id/btn_mode_dark"
+                        android:layout_width="0dp" android:layout_height="match_parent"
+                        android:layout_weight="1" android:gravity="center" android:text="🌙 Dark"
+                        android:textSize="12sp" android:textStyle="bold"
+                        android:clickable="true" android:focusable="true" />
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- ══ ACCOUNT SETTINGS ══ (Notifications row REMOVED) ══ -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="16dp"
+            app:cardBackgroundColor="@color/card_bg"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp">
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:paddingTop="12dp" android:paddingBottom="8dp">
+
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp" android:layout_marginBottom="4dp"
+                    android:text="Account" android:textColor="@color/text_primary"
+                    android:textSize="15sp" android:textStyle="bold" />
+
+                <!-- Edit Profile -->
+                <LinearLayout android:id="@+id/row_edit_profile"
+                    android:layout_width="match_parent" android:layout_height="56dp"
+                    android:gravity="center_vertical" android:orientation="horizontal"
+                    android:paddingHorizontal="16dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true" android:focusable="true">
+                    <FrameLayout android:layout_width="36dp" android:layout_height="36dp"
+                        android:background="@drawable/bg_icon_circle">
+                        <ImageView android:layout_width="18dp" android:layout_height="18dp"
+                            android:layout_gravity="center" android:src="@drawable/ic_person"
+                            app:tint="@color/primary_teal" />
+                    </FrameLayout>
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp" android:layout_weight="1"
+                        android:text="Edit Profile" android:textColor="@color/text_primary" android:textSize="14sp" />
+                    <ImageView android:layout_width="16dp" android:layout_height="16dp"
+                        android:src="@drawable/ic_chevron_right" app:tint="@color/text_tertiary" />
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp"
+                    android:layout_marginStart="64dp" android:background="@color/divider" />
+
+                <!-- Change Password -->
+                <LinearLayout android:id="@+id/row_change_password"
+                    android:layout_width="match_parent" android:layout_height="56dp"
+                    android:gravity="center_vertical" android:orientation="horizontal"
+                    android:paddingHorizontal="16dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true" android:focusable="true">
+                    <FrameLayout android:layout_width="36dp" android:layout_height="36dp"
+                        android:background="@drawable/bg_icon_circle">
+                        <ImageView android:layout_width="18dp" android:layout_height="18dp"
+                            android:layout_gravity="center" android:src="@drawable/ic_person"
+                            app:tint="@color/action_ai" />
+                    </FrameLayout>
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp" android:layout_weight="1"
+                        android:text="Change Password" android:textColor="@color/text_primary" android:textSize="14sp" />
+                    <ImageView android:layout_width="16dp" android:layout_height="16dp"
+                        android:src="@drawable/ic_chevron_right" app:tint="@color/text_tertiary" />
+                </LinearLayout>
+
+                <!-- NOTE: Notifications row deliberately removed per design spec -->
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- ══ SUPPORT ══ -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="16dp"
+            app:cardBackgroundColor="@color/card_bg"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp">
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:paddingTop="12dp" android:paddingBottom="8dp">
+
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp" android:layout_marginBottom="4dp"
+                    android:text="Support" android:textColor="@color/text_primary"
+                    android:textSize="15sp" android:textStyle="bold" />
+
+                <LinearLayout android:id="@+id/row_help"
+                    android:layout_width="match_parent" android:layout_height="56dp"
+                    android:gravity="center_vertical" android:orientation="horizontal"
+                    android:paddingHorizontal="16dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true" android:focusable="true">
+                    <FrameLayout android:layout_width="36dp" android:layout_height="36dp"
+                        android:background="@drawable/bg_icon_circle">
+                        <ImageView android:layout_width="18dp" android:layout_height="18dp"
+                            android:layout_gravity="center" android:src="@drawable/ic_person"
+                            app:tint="@color/status_normal" />
+                    </FrameLayout>
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp" android:layout_weight="1"
+                        android:text="Help &amp; Support" android:textColor="@color/text_primary" android:textSize="14sp" />
+                    <ImageView android:layout_width="16dp" android:layout_height="16dp"
+                        android:src="@drawable/ic_chevron_right" app:tint="@color/text_tertiary" />
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp"
+                    android:layout_marginStart="64dp" android:background="@color/divider" />
+
+                <LinearLayout android:id="@+id/row_privacy"
+                    android:layout_width="match_parent" android:layout_height="56dp"
+                    android:gravity="center_vertical" android:orientation="horizontal"
+                    android:paddingHorizontal="16dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true" android:focusable="true">
+                    <FrameLayout android:layout_width="36dp" android:layout_height="36dp"
+                        android:background="@drawable/bg_icon_circle">
+                        <ImageView android:layout_width="18dp" android:layout_height="18dp"
+                            android:layout_gravity="center" android:src="@drawable/ic_person"
+                            app:tint="@color/text_secondary" />
+                    </FrameLayout>
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp" android:layout_weight="1"
+                        android:text="Privacy Policy" android:textColor="@color/text_primary" android:textSize="14sp" />
+                    <ImageView android:layout_width="16dp" android:layout_height="16dp"
+                        android:src="@drawable/ic_chevron_right" app:tint="@color/text_tertiary" />
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- ══ LOG OUT ══ -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_logout"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="8dp"
+            android:text="Log Out"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:backgroundTint="@color/status_critical"
+            app:cornerRadius="12dp"
+            app:rippleColor="#44FFFFFF" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="4dp"
+            android:text="MediConnect v1.0.0"
+            android:textColor="@color/text_tertiary"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

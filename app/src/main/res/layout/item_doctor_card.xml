@@ -5,124 +5,175 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="2dp"
     android:clickable="true"
     android:focusable="true"
-    android:foreground="?attr/selectableItemBackground">
+    android:foreground="?attr/selectableItemBackground"
+    app:cardBackgroundColor="@color/card_bg"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="2dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp"
-        android:gravity="center_vertical">
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <!-- Doctor Avatar -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            app:cardCornerRadius="30dp"
-            app:cardElevation="0dp">
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:src="@drawable/doctor_avatar"
-                android:scaleType="centerCrop"
-                android:background="@color/icon_bg_teal" />
-        </androidx.cardview.widget.CardView>
-
-        <!-- Doctor Info -->
+        <!-- Top row: Avatar + Info + Status -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:layout_marginStart="14dp">
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-            <TextView
-                android:id="@+id/doctor_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Dr. Juan Reyes"
-                android:textColor="@color/text_primary"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/doctor_specialty"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Cardiologist • St. Luke's Hospital"
-                android:textColor="@color/text_secondary"
-                android:textSize="13sp"
-                android:layout_marginTop="2dp" />
-
-            <!-- Rating & Experience Row -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="6dp">
+            <!-- Avatar circle with initials -->
+            <FrameLayout
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:background="@drawable/circle_avatar_bg">
 
                 <TextView
-                    android:id="@+id/doctor_distance"
+                    android:id="@+id/doctor_initials"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="1.2 km away"
+                    android:layout_gravity="center"
+                    android:text="?"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </FrameLayout>
+
+            <!-- Doctor details -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/doctor_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Dr. —"
+                    android:textColor="@color/text_primary"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/doctor_specialty"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Specialist"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp" />
+
+                <!-- Availability pill -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <View
+                        android:id="@+id/status_dot"
+                        android:layout_width="8dp"
+                        android:layout_height="8dp"
+                        android:background="@drawable/bg_status_available" />
+
+                    <TextView
+                        android:id="@+id/doctor_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="Available"
+                        android:textColor="@color/status_available"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Fee badge -->
+            <TextView
+                android:id="@+id/doctor_fee"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_type_badge"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="5dp"
+                android:text="₱0"
+                android:textColor="@color/primary_teal"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginVertical="12dp"
+            android:background="@color/divider" />
+
+        <!-- Bottom row: Location + Days + Book button -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <!-- Location -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="13dp"
+                        android:layout_height="13dp"
+                        android:src="@drawable/marker"
+                        app:tint="@color/text_tertiary" />
+
+                    <TextView
+                        android:id="@+id/doctor_distance"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:text="Location"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <!-- Available days -->
+                <TextView
+                    android:id="@+id/doctor_days"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
                     android:textColor="@color/text_tertiary"
                     android:textSize="12sp" />
             </LinearLayout>
 
-            <!-- Status -->
-            <LinearLayout
+            <!-- Book Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/book_button"
+                style="@style/Widget.Material3.Button"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginTop="6dp">
-
-                <View
-                    android:id="@+id/status_dot"
-                    android:layout_width="8dp"
-                    android:layout_height="8dp"
-                    android:background="@drawable/bg_status_available" />
-
-                <TextView
-                    android:id="@+id/doctor_status"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Available"
-                    android:textColor="@color/status_available"
-                    android:textSize="12sp"
-                    android:layout_marginStart="6dp" />
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <!-- Book Button -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/book_button"
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            app:cardCornerRadius="18dp"
-            app:cardBackgroundColor="@color/primary_teal"
-            app:cardElevation="0dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackground">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="38dp"
                 android:text="Book"
-                android:textColor="@color/white"
                 android:textSize="13sp"
                 android:textStyle="bold"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="8dp" />
-        </androidx.cardview.widget.CardView>
+                app:backgroundTint="@color/primary_teal"
+                app:cornerRadius="19dp" />
 
+        </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

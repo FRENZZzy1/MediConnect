@@ -1,19 +1,21 @@
 package com.example.mediconnect;
 
 import android.content.Intent;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
@@ -26,14 +28,19 @@ import java.util.List;
 
 public class AppointmentsFragment extends Fragment {
 
-    private TabLayout tabLayout;
-    private RecyclerView appointmentsRecyclerView;
-    private TextView emptyStateText;
-    private AppointmentsAdapter appointmentsAdapter;
-    private List<Appointment> appointmentList;
+    // ── Views ──────────────────────────────────────────────────────────────────
+    private TextView tabUpcoming, tabPast, tabCancelled;
+    private RecyclerView recyclerView;
+    private View loadingSpinner;
+    private LinearLayout emptyStateContainer;
+    private TextView tvEmptyTitle, tvEmptySub;
+
+    // ── Data ───────────────────────────────────────────────────────────────────
+    private AppointmentsAdapter adapter;
+    private final List<Appointment> appointmentList = new ArrayList<>();
+    private String currentFilter = "upcoming";
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
-    private String currentFilter = "upcoming"; // upcoming, past, cancelled
 
     @Nullable
     @Override
@@ -41,197 +48,203 @@ public class AppointmentsFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_appointments, container, false);
 
-        db = FirebaseFirestore.getInstance();
+        db    = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
 
-        initializeViews(view);
-        setupTabLayout();
+        bindViews(view);
         setupRecyclerView();
+        setupSegmentedTabs();
         loadAppointments();
-
         return view;
     }
 
-    private void initializeViews(View view) {
-        tabLayout = view.findViewById(R.id.tab_layout);
-        appointmentsRecyclerView = view.findViewById(R.id.appointments_recycler_view);
-        emptyStateText = view.findViewById(R.id.empty_state_text);
+    private void bindViews(View view) {
+        tabUpcoming        = view.findViewById(R.id.tab_upcoming);
+        tabPast            = view.findViewById(R.id.tab_past);
+        tabCancelled       = view.findViewById(R.id.tab_cancelled);
+        recyclerView       = view.findViewById(R.id.appointments_recycler_view);
+        loadingSpinner     = view.findViewById(R.id.appointments_loading);
+        emptyStateContainer= view.findViewById(R.id.empty_state_container);
+        tvEmptyTitle       = view.findViewById(R.id.empty_state_text);
+        tvEmptySub         = view.findViewById(R.id.empty_state_sub);
     }
 
-    private void setupTabLayout() {
-        tabLayout.addTab(tabLayout.newTab().setText("Upcoming"));
-        tabLayout.addTab(tabLayout.newTab().setText("Past"));
-        tabLayout.addTab(tabLayout.newTab().setText("Cancelled"));
+    // ── Custom segmented tab logic ─────────────────────────────────────────────
 
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                switch (tab.getPosition()) {
-                    case 0:
-                        currentFilter = "upcoming";
-                        break;
-                    case 1:
-                        currentFilter = "past";
-                        break;
-                    case 2:
-                        currentFilter = "cancelled";
-                        break;
-                }
-                loadAppointments();
-            }
+    private void setupSegmentedTabs() {
+        // Set initial active state
+        setTabActive(tabUpcoming);
+        setTabInactive(tabPast);
+        setTabInactive(tabCancelled);
 
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {}
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {}
-        });
+        tabUpcoming.setOnClickListener(v -> selectTab("upcoming"));
+        tabPast.setOnClickListener(    v -> selectTab("past"));
+        tabCancelled.setOnClickListener(v -> selectTab("cancelled"));
     }
+
+    private void selectTab(String filter) {
+        currentFilter = filter;
+        setTabInactive(tabUpcoming);
+        setTabInactive(tabPast);
+        setTabInactive(tabCancelled);
+
+        switch (filter) {
+            case "upcoming":  setTabActive(tabUpcoming);  break;
+            case "past":      setTabActive(tabPast);      break;
+            case "cancelled": setTabActive(tabCancelled); break;
+        }
+        loadAppointments();
+    }
+
+    private void setTabActive(TextView tab) {
+        if (tab == null || !isAdded()) return;
+        GradientDrawable bg = new GradientDrawable();
+        bg.setShape(GradientDrawable.RECTANGLE);
+        bg.setCornerRadius(dpToPx(8));
+        bg.setColor(0xFFFFFFFF);   // white pill on the teal header
+        tab.setBackground(bg);
+        tab.setTextColor(ContextCompat.getColor(requireContext(), R.color.primary_teal_dark));
+    }
+
+    private void setTabInactive(TextView tab) {
+        if (tab == null || !isAdded()) return;
+        tab.setBackground(null);
+        tab.setTextColor(0xCCFFFFFF);  // semi-transparent white
+    }
+
+    private float dpToPx(int dp) {
+        return dp * requireContext().getResources().getDisplayMetrics().density;
+    }
+
+    // ── RecyclerView ───────────────────────────────────────────────────────────
 
     private void setupRecyclerView() {
-        appointmentList = new ArrayList<>();
-        appointmentsAdapter = new AppointmentsAdapter(appointmentList, appointment -> {
-            // Click handler - open detail
-            Intent intent = new Intent(getActivity(), AppointmentDetailActivity.class);
-            intent.putExtra("appointment_id", appointment.getAppointmentId());
-            intent.putExtra("doctor_name", appointment.getDoctorName());
-            intent.putExtra("doctor_specialty", appointment.getDoctorSpecialty());
-            intent.putExtra("date", appointment.getDate());
-            intent.putExtra("time", appointment.getTime());
-            intent.putExtra("type", appointment.getType());
-            intent.putExtra("status", appointment.getStatus());
-            intent.putExtra("notes", appointment.getNotes());
-            intent.putExtra("hospital", appointment.getDoctorHospital());
-            startActivity(intent);
+        adapter = new AppointmentsAdapter(appointmentList, appt -> {
+            Intent i = new Intent(getActivity(), AppointmentDetailActivity.class);
+            i.putExtra("appointment_id",   appt.getAppointmentId());
+            i.putExtra("doctor_name",      appt.getDoctorName());
+            i.putExtra("doctor_specialty", appt.getDoctorSpecialty());
+            i.putExtra("date",             appt.getDate());
+            i.putExtra("time",             appt.getTime());
+            i.putExtra("type",             appt.getType());
+            i.putExtra("status",           appt.getStatus());
+            i.putExtra("notes",            appt.getNotes());
+            i.putExtra("hospital",         appt.getDoctorHospital());
+            startActivity(i);
         });
-
-        appointmentsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        appointmentsRecyclerView.setAdapter(appointmentsAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setAdapter(adapter);
     }
+
+    // ── Firestore load ─────────────────────────────────────────────────────────
 
     private void loadAppointments() {
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser == null) return;
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user == null) { showEmpty(); return; }
 
-        String patientId = currentUser.getUid();
+        showLoading();
 
         db.collection("appointments")
-                .whereEqualTo("patientId", patientId)
-                .orderBy("date", Query.Direction.DESCENDING)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    appointmentList.clear();
+            .whereEqualTo("patientId", user.getUid())
+            .orderBy("date", Query.Direction.DESCENDING)
+            .get()
+            .addOnSuccessListener(snapshots -> {
+                if (!isAdded()) return;
+                appointmentList.clear();
+                List<Appointment> filtered = new ArrayList<>();
 
-                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                        Appointment appointment = document.toObject(Appointment.class);
-                        appointment.setAppointmentId(document.getId());
+                for (QueryDocumentSnapshot doc : snapshots) {
+                    Appointment appt = doc.toObject(Appointment.class);
+                    appt.setAppointmentId(doc.getId());
 
-                        // Filter based on tab
-                        boolean shouldAdd = false;
-                        if (currentFilter.equals("upcoming") && appointment.isUpcoming()) {
-                            shouldAdd = true;
-                        } else if (currentFilter.equals("past") && !appointment.isUpcoming()
-                                && !appointment.getStatus().equals("cancelled")) {
-                            shouldAdd = true;
-                        } else if (currentFilter.equals("cancelled")
-                                && appointment.getStatus().equals("cancelled")) {
-                            shouldAdd = true;
-                        }
-
-                        if (shouldAdd) {
-                            // Fetch doctor details
-                            fetchDoctorDetails(appointment);
-                        }
+                    boolean add = false;
+                    switch (currentFilter) {
+                        case "upcoming":
+                            add = appt.isUpcoming();
+                            break;
+                        case "past":
+                            add = !appt.isUpcoming()
+                                    && !"cancelled".equalsIgnoreCase(appt.getStatus());
+                            break;
+                        case "cancelled":
+                            add = "cancelled".equalsIgnoreCase(appt.getStatus());
+                            break;
                     }
+                    if (add) filtered.add(appt);
+                }
 
-                    if (appointmentList.isEmpty()) {
-                        showEmptyState();
-                    } else {
-                        hideEmptyState();
+                if (filtered.isEmpty()) { showEmpty(); return; }
+
+                // Fetch doctor names for each, then render
+                final int[] pending = {filtered.size()};
+                for (Appointment appt : filtered) {
+                    String doctorId = appt.getDoctorId();
+                    if (doctorId == null || doctorId.isEmpty()) {
+                        appointmentList.add(appt);
+                        pending[0]--;
+                        if (pending[0] == 0) finishLoading();
+                        continue;
                     }
-                })
-                .addOnFailureListener(e -> {
-                    showEmptyState();
-                });
+                    FirebaseDatabase.getInstance()
+                        .getReference("Doctors").child(doctorId).get()
+                        .addOnCompleteListener(task -> {
+                            if (!isAdded()) return;
+                            if (task.isSuccessful() && task.getResult() != null
+                                    && task.getResult().exists()) {
+                                appt.setDoctorName(
+                                        task.getResult().child("fullName").getValue(String.class));
+                                appt.setDoctorSpecialty(
+                                        task.getResult().child("specialization").getValue(String.class));
+                                appt.setDoctorHospital(
+                                        task.getResult().child("clinicName").getValue(String.class));
+                            }
+                            appointmentList.add(appt);
+                            pending[0]--;
+                            if (pending[0] == 0) finishLoading();
+                        });
+                }
+            })
+            .addOnFailureListener(e -> { if (isAdded()) showEmpty(); });
     }
 
-    private void fetchDoctorDetails(Appointment appointment) {
-        String doctorId = appointment.getDoctorId();
-
-        // Log for debugging
-        android.util.Log.d("AppointmentsFragment", "Fetching doctor details for: " + doctorId);
-
-        if (doctorId == null || doctorId.isEmpty()) {
-            // If no doctorId, still add appointment but with placeholder
-            appointment.setDoctorName("Doctor");
-            appointment.setDoctorSpecialty("Specialist");
-            appointmentList.add(appointment);
-            appointmentsAdapter.notifyDataSetChanged();
-            return;
-        }
-
-        // Fetch from Realtime Database (where doctors are stored)
-        FirebaseDatabase.getInstance()
-                .getReference("Doctors")
-                .child(doctorId)
-                .get()
-                .addOnSuccessListener(snapshot -> {
-                    if (snapshot.exists()) {
-                        String name = snapshot.child("fullName").getValue(String.class);
-                        String specialty = snapshot.child("specialization").getValue(String.class);
-                        String location = snapshot.child("clinicName").getValue(String.class);
-
-                        // Log for debugging
-                        android.util.Log.d("AppointmentsFragment", "Doctor found - Name: " + name + ", Specialty: " + specialty);
-                        
-                        appointment.setDoctorName(name);
-                        appointment.setDoctorSpecialty(specialty);
-                        appointment.setDoctorHospital(location);
-                    } else {
-                        // Doctor document doesn't exist
-                        android.util.Log.w("AppointmentsFragment", "Doctor document not found for ID: " + doctorId);
-                        appointment.setDoctorName("Doctor");
-                        appointment.setDoctorSpecialty("Specialist");
-                    }
-                    appointmentList.add(appointment);
-                    appointmentsAdapter.notifyDataSetChanged();
-
-                    if (!appointmentList.isEmpty()) {
-                        hideEmptyState();
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    android.util.Log.e("AppointmentsFragment", "Error fetching doctor: " + e.getMessage());
-                    appointment.setDoctorName("Doctor");
-                    appointment.setDoctorSpecialty("Specialist");
-                    appointmentList.add(appointment);
-                    appointmentsAdapter.notifyDataSetChanged();
-                });
+    private void finishLoading() {
+        if (!isAdded()) return;
+        hideLoading();
+        if (appointmentList.isEmpty()) { showEmpty(); return; }
+        emptyStateContainer.setVisibility(View.GONE);
+        recyclerView.setVisibility(View.VISIBLE);
+        adapter.notifyDataSetChanged();
     }
 
-    private void showEmptyState() {
-        emptyStateText.setVisibility(View.VISIBLE);
-        appointmentsRecyclerView.setVisibility(View.GONE);
+    // ── State helpers ──────────────────────────────────────────────────────────
 
-        String message;
+    private void showLoading() {
+        loadingSpinner.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.GONE);
+        emptyStateContainer.setVisibility(View.GONE);
+    }
+
+    private void hideLoading() {
+        loadingSpinner.setVisibility(View.GONE);
+    }
+
+    private void showEmpty() {
+        hideLoading();
+        recyclerView.setVisibility(View.GONE);
+        emptyStateContainer.setVisibility(View.VISIBLE);
         switch (currentFilter) {
             case "upcoming":
-                message = "No upcoming appointments\nBook a doctor to get started";
+                tvEmptyTitle.setText("No upcoming appointments");
+                tvEmptySub.setText("Book a doctor to get started");
                 break;
             case "past":
-                message = "No past appointments";
+                tvEmptyTitle.setText("No past appointments");
+                tvEmptySub.setText("Your completed visits will appear here");
                 break;
             case "cancelled":
-                message = "No cancelled appointments";
+                tvEmptyTitle.setText("No cancelled appointments");
+                tvEmptySub.setText("You have no cancelled bookings");
                 break;
-            default:
-                message = "No appointments found";
         }
-        emptyStateText.setText(message);
-    }
-
-    private void hideEmptyState() {
-        emptyStateText.setVisibility(View.GONE);
-        appointmentsRecyclerView.setVisibility(View.VISIBLE);
     }
 }

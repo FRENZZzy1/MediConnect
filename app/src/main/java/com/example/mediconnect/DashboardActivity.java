@@ -1,6 +1,7 @@
 package com.example.mediconnect;
 
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -21,39 +22,33 @@ public class DashboardActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard_host);
 
-        // Handle edge-to-edge
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main_container), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
-            return insets;
-        });
+        // ✅ CORRECT — uses the window decor view, never null
+        View rootView = getWindow().getDecorView().findViewById(android.R.id.content);
+        if (rootView != null) {
+            ViewCompat.setOnApplyWindowInsetsListener(rootView, (v, insets) -> {
+                Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+                v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
+                return insets;
+            });
+        }
 
         bottomNav = findViewById(R.id.bottom_navigation);
 
-        // Load default fragment (Home)
         if (savedInstanceState == null) {
             loadFragment(new HomeFragment(), false, getTabPosition(R.id.nav_home));
             bottomNav.setSelectedItemId(R.id.nav_home);
             currentTabPosition = getTabPosition(R.id.nav_home);
         }
 
-        // Bottom nav click handler
         bottomNav.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
             Fragment selectedFragment = null;
             int nextTabPosition = getTabPosition(itemId);
 
-            if (itemId == R.id.nav_home) {
-                selectedFragment = new HomeFragment();
-            }
-            else if (itemId == R.id.nav_find) {
-                selectedFragment = new FindFragment();
-            }
-            else if (itemId == R.id.nav_appointments) {
-                selectedFragment = new AppointmentsFragment();
-            } else if (itemId == R.id.nav_profile) {
-                selectedFragment = new ProfileFragment();
-            }
+            if      (itemId == R.id.nav_home)         selectedFragment = new HomeFragment();
+            else if (itemId == R.id.nav_find)         selectedFragment = new FindFragment();
+            else if (itemId == R.id.nav_appointments) selectedFragment = new AppointmentsFragment();
+            else if (itemId == R.id.nav_profile)      selectedFragment = new ProfileFragment();
 
             if (selectedFragment != null) {
                 loadFragment(selectedFragment, true, nextTabPosition);
@@ -64,49 +59,44 @@ public class DashboardActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Called by HomeFragment's "Book" button to programmatically switch to the Find tab.
+     * Tab indices: 0=Home, 1=Find, 2=Appointments, 3=Profile
+     */
+    public void switchToTab(int tabIndex) {
+        int itemId;
+        switch (tabIndex) {
+            case 1:  itemId = R.id.nav_find;         break;
+            case 2:  itemId = R.id.nav_appointments; break;
+            case 3:  itemId = R.id.nav_profile;      break;
+            default: itemId = R.id.nav_home;         break;
+        }
+        bottomNav.setSelectedItemId(itemId);
+    }
+
     private void loadFragment(Fragment fragment, boolean animate, int nextTabPosition) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
         if (animate) {
             if (nextTabPosition > currentTabPosition) {
                 transaction.setCustomAnimations(
-                        R.anim.slide_in_right,
-                        R.anim.slide_out_left,
-                        R.anim.slide_in_left,
-                        R.anim.slide_out_right
-                );
+                        R.anim.slide_in_right, R.anim.slide_out_left,
+                        R.anim.slide_in_left,  R.anim.slide_out_right);
             } else if (nextTabPosition < currentTabPosition) {
                 transaction.setCustomAnimations(
-                        R.anim.slide_in_left,
-                        R.anim.slide_out_right,
-                        R.anim.slide_in_right,
-                        R.anim.slide_out_left
-                );
+                        R.anim.slide_in_left,  R.anim.slide_out_right,
+                        R.anim.slide_in_right, R.anim.slide_out_left);
             }
         }
 
-        transaction
-                .setReorderingAllowed(true)
-                .replace(R.id.fragment_container, fragment)
-                .commit();
+        transaction.replace(R.id.fragment_container, fragment).commit();
     }
 
     private int getTabPosition(int itemId) {
-        if (itemId == R.id.nav_home) {
-            return 0;
-        } else if (itemId == R.id.nav_find) {
-            return 1;
-        } else if (itemId == R.id.nav_appointments) {
-            return 2;
-        } else if (itemId == R.id.nav_profile) {
-            return 3;
-        }
-        return currentTabPosition;
-    }
-
-    // Public method for fragments to access bottom nav if needed
-    @SuppressWarnings("unused")
-    public BottomNavigationView getBottomNav() {
-        return bottomNav;
+        if (itemId == R.id.nav_home)         return 0;
+        if (itemId == R.id.nav_find)         return 1;
+        if (itemId == R.id.nav_appointments) return 2;
+        if (itemId == R.id.nav_profile)      return 3;
+        return 0;
     }
 }

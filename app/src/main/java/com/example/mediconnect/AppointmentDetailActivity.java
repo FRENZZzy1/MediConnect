@@ -3,29 +3,24 @@ package com.example.mediconnect;
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class AppointmentDetailActivity extends AppCompatActivity {
 
-    private ImageView backButton;
-    private TextView doctorNameText, specialtyText, hospitalText, dateText, timeText,
-            typeText, statusText, notesText;
-    private View statusIndicator;
-    private MaterialButton cancelButton, rescheduleButton;
-    private LinearLayout actionButtonsContainer;
-    private CardView joinCallButton;
+    private TextView tvDoctorName, tvSpecialty, tvHospital, tvDate, tvTime;
+    private TextView tvType, tvStatus, tvNotes, tvDoctorInitials;
+    private View     statusIndicator;
+    private MaterialButton cancelButton, rescheduleButton, joinCallButton;
+    private View     actionButtonsContainer;
 
-    private String appointmentId;
-    private String currentStatus;
+    private String appointmentId, currentStatus;
     private FirebaseFirestore db;
 
     @Override
@@ -35,162 +30,153 @@ public class AppointmentDetailActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
 
-        // Get data from intent
         appointmentId = getIntent().getStringExtra("appointment_id");
-        String doctorName = getIntent().getStringExtra("doctor_name");
-        String doctorSpecialty = getIntent().getStringExtra("doctor_specialty");
-        String date = getIntent().getStringExtra("date");
-        String time = getIntent().getStringExtra("time");
-        String type = getIntent().getStringExtra("type");
-        currentStatus = getIntent().getStringExtra("status");
-        String notes = getIntent().getStringExtra("notes");
-        String hospital = getIntent().getStringExtra("hospital");
+        String doctorName    = getIntent().getStringExtra("doctor_name");
+        String specialty     = getIntent().getStringExtra("doctor_specialty");
+        String hospital      = getIntent().getStringExtra("hospital");
+        String date          = getIntent().getStringExtra("date");
+        String time          = getIntent().getStringExtra("time");
+        String type          = getIntent().getStringExtra("type");
+        currentStatus        = getIntent().getStringExtra("status");
+        String notes         = getIntent().getStringExtra("notes");
 
-        initializeViews();
-        populateData(doctorName, doctorSpecialty, hospital, date, time, type, currentStatus, notes);
-        setupClickListeners();
-        setupButtonsBasedOnStatus();
+        bindViews();
+        populate(doctorName, specialty, hospital, date, time, type, currentStatus, notes);
+        setupButtons();
     }
 
-    private void initializeViews() {
-        backButton = findViewById(R.id.back_button);
-        doctorNameText = findViewById(R.id.detail_doctor_name);
-        specialtyText = findViewById(R.id.detail_specialty);
-        hospitalText = findViewById(R.id.detail_hospital);
-        dateText = findViewById(R.id.detail_date);
-        timeText = findViewById(R.id.detail_time);
-        typeText = findViewById(R.id.detail_type);
-        statusText = findViewById(R.id.detail_status);
-        statusIndicator = findViewById(R.id.detail_status_indicator);
-        notesText = findViewById(R.id.detail_notes);
-        cancelButton = findViewById(R.id.cancel_button);
-        rescheduleButton = findViewById(R.id.reschedule_button);
-        actionButtonsContainer = findViewById(R.id.action_buttons_container);
-        joinCallButton = findViewById(R.id.join_call_button);
+    private void bindViews() {
+        tvDoctorInitials      = findViewById(R.id.detail_doctor_initials);
+        tvDoctorName          = findViewById(R.id.detail_doctor_name);
+        tvSpecialty           = findViewById(R.id.detail_specialty);
+        tvHospital            = findViewById(R.id.detail_hospital);
+        tvDate                = findViewById(R.id.detail_date);
+        tvTime                = findViewById(R.id.detail_time);
+        tvType                = findViewById(R.id.detail_type);
+        tvStatus              = findViewById(R.id.detail_status);
+        statusIndicator       = findViewById(R.id.detail_status_indicator);
+        tvNotes               = findViewById(R.id.detail_notes);
+        cancelButton          = findViewById(R.id.cancel_button);
+        rescheduleButton      = findViewById(R.id.reschedule_button);
+        joinCallButton        = findViewById(R.id.join_call_button);
+        actionButtonsContainer= findViewById(R.id.action_buttons_container);
+
+        // Back button
+        View backBtn = findViewById(R.id.back_button);
+        if (backBtn != null) backBtn.setOnClickListener(v -> finish());
     }
 
-    private void populateData(String doctorName, String specialty, String hospital,
-                              String date, String time, String type, String status, String notes) {
-        // Format doctor name with "Dr. " prefix
-        String formattedName = doctorName;
-        if (doctorName != null && !doctorName.isEmpty()) {
-            if (!doctorName.startsWith("Dr.")) {
-                formattedName = "Dr. " + doctorName;
-            }
-        } else {
-            formattedName = "Doctor";
-        }
+    private void populate(String doctorName, String specialty, String hospital,
+                          String date, String time, String type, String status, String notes) {
+        // Format name
+        String name = (doctorName != null && !doctorName.isEmpty()) ? doctorName : "Doctor";
+        if (!name.startsWith("Dr.")) name = "Dr. " + name;
+        tvDoctorName.setText(name);
 
-        doctorNameText.setText(formattedName);
-        specialtyText.setText(specialty != null && !specialty.isEmpty() ? specialty : "");
-        hospitalText.setText(hospital != null && !hospital.isEmpty() ? hospital : "");
-        dateText.setText(date != null ? date : "");
-        timeText.setText(time != null ? time : "");
-        typeText.setText(type != null ? type : "Consultation");
-        notesText.setText(notes != null && !notes.isEmpty() ? notes : "No additional notes");
+        // Initials
+        tvDoctorInitials.setText(getInitials(doctorName));
+
+        tvSpecialty.setText(specialty != null ? specialty : "");
+        tvHospital.setText(hospital   != null ? hospital  : "");
+        tvDate.setText(date           != null ? date      : "—");
+        tvTime.setText(time           != null ? time      : "—");
+        tvType.setText(type           != null ? type      : "Consultation");
+        tvNotes.setText((notes != null && !notes.isEmpty()) ? notes : "No additional notes.");
 
         // Status styling
-        if (status != null) {
-            switch (status.toLowerCase()) {
-                case "confirmed":
-                    statusText.setText("Confirmed");
-                    statusText.setTextColor(getResources().getColor(R.color.status_available));
-                    statusIndicator.setBackgroundResource(R.drawable.bg_status_available);
-                    break;
-                case "completed":
-                    statusText.setText("Completed");
-                    statusText.setTextColor(getResources().getColor(R.color.text_tertiary));
-                    statusIndicator.setBackgroundResource(R.drawable.bg_status_completed);
-                    break;
-                case "cancelled":
-                    statusText.setText("Cancelled");
-                    statusText.setTextColor(getResources().getColor(R.color.status_busy));
-                    statusIndicator.setBackgroundResource(R.drawable.bg_status_busy);
-                    break;
-                default:
-                    statusText.setText("Pending");
-                    statusText.setTextColor(getResources().getColor(R.color.accent_orange));
-                    statusIndicator.setBackgroundResource(R.drawable.bg_status_away);
-            }
+        if (status == null) status = "pending";
+        switch (status.toLowerCase()) {
+            case "confirmed":
+                tvStatus.setText("Confirmed");
+                tvStatus.setTextColor(ContextCompat.getColor(this, R.color.status_available));
+                statusIndicator.setBackgroundResource(R.drawable.bg_status_available);
+                break;
+            case "completed":
+                tvStatus.setText("Completed");
+                tvStatus.setTextColor(ContextCompat.getColor(this, R.color.text_tertiary));
+                statusIndicator.setBackgroundResource(R.drawable.bg_status_completed);
+                break;
+            case "cancelled":
+                tvStatus.setText("Cancelled");
+                tvStatus.setTextColor(ContextCompat.getColor(this, R.color.status_busy));
+                statusIndicator.setBackgroundResource(R.drawable.bg_status_busy);
+                break;
+            default:
+                tvStatus.setText("Pending");
+                tvStatus.setTextColor(ContextCompat.getColor(this, R.color.accent_orange));
+                statusIndicator.setBackgroundResource(R.drawable.bg_status_away);
         }
     }
 
-    private void setupButtonsBasedOnStatus() {
+    private void setupButtons() {
         if (currentStatus == null) return;
+        String type = getIntent().getStringExtra("type");
 
         switch (currentStatus.toLowerCase()) {
             case "confirmed":
-                // Show cancel, reschedule, and join call (if video)
+            case "pending":
                 actionButtonsContainer.setVisibility(View.VISIBLE);
                 cancelButton.setVisibility(View.VISIBLE);
                 rescheduleButton.setVisibility(View.VISIBLE);
-
-                // Show join call button for video consultations
-                String type = getIntent().getStringExtra("type");
-                if (type != null && type.toLowerCase().contains("video")) {
-                    joinCallButton.setVisibility(View.VISIBLE);
-                } else {
-                    joinCallButton.setVisibility(View.GONE);
-                }
+                boolean isVideo = type != null &&
+                        (type.toLowerCase().contains("video") || type.toLowerCase().contains("online"));
+                joinCallButton.setVisibility(isVideo ? View.VISIBLE : View.GONE);
                 break;
-
             case "completed":
-                // Hide action buttons, show review option (future feature)
                 actionButtonsContainer.setVisibility(View.GONE);
                 joinCallButton.setVisibility(View.GONE);
                 break;
-
             case "cancelled":
-                // Only show reschedule
                 actionButtonsContainer.setVisibility(View.VISIBLE);
                 cancelButton.setVisibility(View.GONE);
                 rescheduleButton.setVisibility(View.VISIBLE);
                 joinCallButton.setVisibility(View.GONE);
                 break;
         }
+
+        cancelButton.setOnClickListener(v -> confirmCancel());
+        rescheduleButton.setOnClickListener(v ->
+                Toast.makeText(this, "Reschedule — coming soon", Toast.LENGTH_SHORT).show());
+        joinCallButton.setOnClickListener(v ->
+                Toast.makeText(this, "Joining video call…", Toast.LENGTH_SHORT).show());
     }
 
-    private void setupClickListeners() {
-        backButton.setOnClickListener(v -> finish());
-
-        cancelButton.setOnClickListener(v -> showCancelConfirmation());
-
-        rescheduleButton.setOnClickListener(v -> {
-            Toast.makeText(this, "Reschedule feature coming soon!", Toast.LENGTH_SHORT).show();
-            // TODO: Open reschedule flow
-        });
-
-        joinCallButton.setOnClickListener(v -> {
-            Toast.makeText(this, "Joining video call...", Toast.LENGTH_SHORT).show();
-            // TODO: Start video call activity
-        });
-    }
-
-    private void showCancelConfirmation() {
+    private void confirmCancel() {
         new AlertDialog.Builder(this)
                 .setTitle("Cancel Appointment")
                 .setMessage("Are you sure you want to cancel this appointment?")
-                .setPositiveButton("Yes, Cancel", (dialog, which) -> cancelAppointment())
+                .setPositiveButton("Yes, Cancel", (d, w) -> cancelAppointment())
                 .setNegativeButton("No, Keep It", null)
                 .show();
     }
 
     private void cancelAppointment() {
         if (appointmentId == null) return;
-
         db.collection("appointments").document(appointmentId)
                 .update("status", "cancelled")
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "Appointment cancelled", Toast.LENGTH_SHORT).show();
+                .addOnSuccessListener(v -> {
                     currentStatus = "cancelled";
-                    setupButtonsBasedOnStatus();
-                    statusText.setText("Cancelled");
-                    statusText.setTextColor(getResources().getColor(R.color.status_busy));
+                    tvStatus.setText("Cancelled");
+                    tvStatus.setTextColor(ContextCompat.getColor(this, R.color.status_busy));
                     statusIndicator.setBackgroundResource(R.drawable.bg_status_busy);
+                    actionButtonsContainer.setVisibility(View.VISIBLE);
+                    cancelButton.setVisibility(View.GONE);
+                    joinCallButton.setVisibility(View.GONE);
+                    Toast.makeText(this, "Appointment cancelled", Toast.LENGTH_SHORT).show();
                 })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Failed to cancel: " + e.getMessage(),
-                            Toast.LENGTH_SHORT).show();
-                });
+                .addOnFailureListener(e ->
+                        Toast.makeText(this, "Failed: " + e.getMessage(),
+                                Toast.LENGTH_SHORT).show());
+    }
+
+    private String getInitials(String name) {
+        if (name == null || name.trim().isEmpty()) return "?";
+        String clean = name.replaceAll("(?i)^Dr\\.?\\s*", "").trim();
+        String[] parts = clean.split("\\s+");
+        if (parts.length == 0) return "?";
+        if (parts.length == 1)
+            return String.valueOf(Character.toUpperCase(parts[0].charAt(0)));
+        return String.valueOf(Character.toUpperCase(parts[0].charAt(0)))
+             + String.valueOf(Character.toUpperCase(parts[parts.length - 1].charAt(0)));
     }
 }

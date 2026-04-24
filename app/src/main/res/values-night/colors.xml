@@ -1,98 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- ─── Splash Background Gradient (Dark) ─── -->
+    <!-- ─── Splash ─── -->
     <color name="splash_gradient_top">#0B5A7A</color>
     <color name="splash_gradient_bottom">#052C3F</color>
 
-    <!-- ─── Primary Brand Colors (Dark) ─── -->
-    <color name="primary_teal">#00BCD4</color>
+    <!-- ─── Brand ─── -->
+    <color name="primary_teal">#1ABCD6</color>
     <color name="primary_teal_dark">#0097A7</color>
     <color name="primary_teal_light">#80DEEA</color>
 
-    <!-- ─── Dashboard Colors (Dark) ─── -->
-    <color name="dashboard_bg">#121212</color>
-    <color name="card_bg">#1E1E1E</color>
+    <!--
+        3-level dark surface hierarchy — keeps cards, backgrounds, and
+        highlights visually distinct from each other:
+          Level 0  dashboard_bg   #0D1117  (screen background — deepest)
+          Level 1  card_bg        #161B22  (card surfaces)
+          Level 2  tab_inactive_bg #1E2D35  (calendar cells, toggle tracks, input fills)
+    -->
+    <color name="dashboard_bg">#0D1117</color>
+    <color name="card_bg">#161B22</color>
     <color name="card_shadow">#0A000000</color>
 
-    <!-- ─── Health Status Colors (Dark) ─── -->
-    <color name="status_normal">#66BB6A</color>
-    <color name="status_warning">#FFA726</color>
-    <color name="status_critical">#EF5350</color>
-    <color name="status_available">#26A69A</color>
-    <color name="status_busy">#90A4AE</color>
+    <!-- ─── Status ─── -->
+    <color name="status_normal">#4ADE80</color>
+    <color name="status_warning">#FB923C</color>
+    <color name="status_critical">#F87171</color>
+    <color name="status_available">#34D399</color>
+    <color name="status_busy">#94A3B8</color>
 
-    <!-- ─── Text Colors (Dark) ─── -->
-    <color name="text_primary">#FFFFFF</color>
-    <color name="text_secondary">#B0B0B0</color>
-    <color name="text_tertiary">#757575</color>
+    <!-- ─── Text ─── -->
+    <color name="text_primary">#E6EDF3</color>
+    <color name="text_secondary">#8B949E</color>
+    <color name="text_tertiary">#484F58</color>
+    <color name="text_white">#FFFFFF</color>
 
-    <!-- ─── Bottom Navigation Colors (Dark) ─── -->
-    <color name="bottom_nav_icon_color">#757575</color>
-    <color name="bottom_nav_text_color">#757575</color>
+    <!-- ─── Quick actions ─── -->
+    <color name="action_video">#1ABCD6</color>
+    <color name="action_ai">#C084FC</color>
+    <color name="action_nearby">#FB923C</color>
+    <color name="action_records">#60A5FA</color>
 
-    <!-- ─── Quick Action Colors (Dark) ─── -->
-    <color name="action_video">#00BCD4</color>
-    <color name="action_ai">#BA68C8</color>
-    <color name="action_nearby">#FF7043</color>
-    <color name="action_records">#42A5F5</color>
+    <!-- ─── Icon circle backgrounds (muted tints on dark) ─── -->
+    <color name="icon_bg_teal">#0E3D47</color>
+    <color name="icon_bg_purple">#2E1B4E</color>
+    <color name="icon_bg_orange">#3D1A0A</color>
+    <color name="icon_bg_blue">#0A2540</color>
 
-    <!-- ─── Icon Background Colors (Dark) ─── -->
-    <color name="icon_bg_teal">#004D5C</color>
-    <color name="icon_bg_purple">#4A148C</color>
-    <color name="icon_bg_orange">#E65100</color>
-    <color name="icon_bg_blue">#01579B</color>
-
-    <!-- ─── Button Colors (Dark) ─── -->
-    <color name="btn_primary">#00BCD4</color>
+    <!-- ─── Buttons ─── -->
+    <color name="btn_primary">#1ABCD6</color>
     <color name="btn_primary_pressed">#0097A7</color>
-    <color name="btn_secondary">#263238</color>
-    <color name="btn_disabled">#424242</color>
+    <color name="btn_secondary">#1E2D35</color>
+    <color name="btn_disabled">#30363D</color>
 
-    <!-- ─── Ripple / Pulse Circles (Dark) ─── -->
+    <!-- ─── Ripple ─── -->
     <color name="ripple_circle_outer">#1AFFFFFF</color>
     <color name="ripple_circle_mid">#20FFFFFF</color>
     <color name="ripple_circle_inner">#2FFFFFFF</color>
 
-    <!-- ─── App Icon Card (Dark) ─── -->
-    <color name="icon_card_bg">#2B2B2B</color>
-    <color name="icon_card_stroke">#40FFFFFF</color>
+    <!-- ─── Icon card ─── -->
+    <color name="icon_card_bg">#21262D</color>
+    <color name="icon_card_stroke">#30363D</color>
 
-    <!-- ─── Brand Text (Dark) ─── -->
+    <!-- ─── Brand text ─── -->
     <color name="brand_white">#FFFFFF</color>
     <color name="tagline_white">#B3FFFFFF</color>
 
-    <!-- ─── Get Started Button (Dark) ─── -->
-    <color name="btn_primary_bg">#1E1E1E</color>
-    <color name="btn_primary_text">#00BCD4</color>
-    <color name="btn_ripple">#2200BCD4</color>
-
-    <!-- ─── Sign In Row (Dark) ─── -->
+    <!-- ─── Get started / sign in ─── -->
+    <color name="btn_primary_bg">#161B22</color>
+    <color name="btn_primary_text">#1ABCD6</color>
+    <color name="btn_ripple">#221ABCD6</color>
     <color name="signin_label">#B3FFFFFF</color>
-    <color name="signin_link">#00BCD4</color>
+    <color name="signin_link">#1ABCD6</color>
 
-    <!-- ─── Utility (Dark) ─── -->
-    <color name="accent_orange">#FF9800</color>
+    <!-- ─── Utility ─── -->
+    <color name="accent_orange">#FB923C</color>
     <color name="transparent">#00000000</color>
     <color name="white">#FFFFFF</color>
-    <color name="divider">#424242</color>
+    <color name="divider">#21262D</color>
     <color name="overlay">#80000000</color>
+    <color name="accent_coral">#FB7185</color>
+    <color name="primary_teal_50">#0D2E35</color>
 
-    <color name="accent_coral">#FF7043</color>
-    <color name="primary_teal_50">#1A3A42</color>
+    <!--
+        tab_inactive_bg — CRITICAL token.
+        Used for calendar unselected day cells, time-slot pills, and toggle tracks.
+        Must be brighter than card_bg (#161B22) so the cells are actually visible.
+        #1E2D35 is a subtle teal-tinted dark that contrasts clearly on the card surface.
+    -->
+    <color name="teal_primary">#1ABCD6</color>
+    <color name="tab_inactive_bg">#1E2D35</color>
+    <color name="tab_inactive_text">#8B949E</color>
 
+    <!-- Bottom navigation -->
+    <color name="bottom_nav_icon_color">#484F58</color>
+    <color name="bottom_nav_text_color">#484F58</color>
 
-    <!--DOCTOR SIDE-->
-    <color name="background">#121212</color>
-    <color name="cardBackground">#1E1E1E</color>
-    <color name="textPrimary">#FFFFFF</color>
-    <color name="textSecondary">#B0B0B0</color>
-
-
-    <color name="startcolorDashboard">#022B36</color>
-    <color name="centertcolorDashboard">#0A4D5E</color>
-    <color name="endcolorDashboard">#12738A</color>
-
+    <!-- Doctor side (keep parity) -->
+    <color name="background">#0D1117</color>
+    <color name="cardBackground">#161B22</color>
+    <color name="textPrimary">#E6EDF3</color>
+    <color name="textSecondary">#8B949E</color>
+    <color name="startcolorDashboard">#044A5A</color>
+    <color name="centertcolorDashboard">#0891B2</color>
+    <color name="endcolorDashboard">#06B6D4</color>
 
 </resources>
-

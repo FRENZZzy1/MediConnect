@@ -8,12 +8,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -31,40 +31,36 @@ import java.util.List;
 
 public class FindFragment extends Fragment {
 
-    // ─── Views ───────────────────────────────────────────────────────────────────
-    private EditText searchEditText;
+    private EditText  searchEditText;
     private ChipGroup specialtyChipGroup;
     private RecyclerView doctorsRecyclerView;
+    private View     loadingSpinner, emptyState;
+    private TextView tvResultsCount;
 
-    // ─── Data ────────────────────────────────────────────────────────────────────
     private DoctorsAdapter doctorsAdapter;
     private final List<Doctor> doctorList = new ArrayList<>();
     private String activeChip = "All";
 
-    // ─── Lifecycle ───────────────────────────────────────────────────────────────
-
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_find, container, false);
 
-        initViews(view);
-        setupRecyclerView();
-        setupSearch();
-        fetchDoctorsFromFirebase();
-
-        return view;
-    }
-
-    // ─── View Setup ──────────────────────────────────────────────────────────────
-
-    private void initViews(View view) {
         searchEditText      = view.findViewById(R.id.search_edit_text);
         specialtyChipGroup  = view.findViewById(R.id.specialty_chip_group);
         doctorsRecyclerView = view.findViewById(R.id.doctors_recycler_view);
+        loadingSpinner      = view.findViewById(R.id.find_loading);
+        emptyState          = view.findViewById(R.id.find_empty_state);
+        tvResultsCount      = view.findViewById(R.id.tv_results_count);
+
+        setupRecyclerView();
+        setupSearch();
+        fetchDoctors();
+        return view;
     }
+
+    // ── RecyclerView ──────────────────────────────────────────────────────────
 
     private void setupRecyclerView() {
         doctorsAdapter = new DoctorsAdapter(doctorList);
@@ -72,94 +68,114 @@ public class FindFragment extends Fragment {
         doctorsRecyclerView.setAdapter(doctorsAdapter);
     }
 
-    // ─── Firebase ────────────────────────────────────────────────────────────────
+    // ── Firebase ──────────────────────────────────────────────────────────────
 
-    private void fetchDoctorsFromFirebase() {
-        DatabaseReference doctorsRef = FirebaseDatabase.getInstance()
-                .getReference("Doctors");
-
-        doctorsRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                doctorList.clear();
-
-                for (DataSnapshot child : snapshot.getChildren()) {
-                    Doctor doctor = child.getValue(Doctor.class);
-                    if (doctor != null) {
-                        doctor.uid = child.getKey();
-                        doctorList.add(doctor);
+    private void fetchDoctors() {
+        showLoading();
+        FirebaseDatabase.getInstance()
+            .getReference("Doctors")
+            .addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (!isAdded()) return;
+                    doctorList.clear();
+                    for (DataSnapshot child : snapshot.getChildren()) {
+                        Doctor d = child.getValue(Doctor.class);
+                        if (d != null) {
+                            d.uid = child.getKey();
+                            doctorList.add(d);
+                        }
                     }
+                    buildSpecialtyChips(doctorList);
+                    doctorsAdapter.setFullList(doctorList);
+                    applyFilters();
+                    hideLoading();
                 }
 
-                buildSpecialtyChips(doctorList);
-                doctorsAdapter.setFullList(doctorList);
-                applyFilters();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                if (getContext() != null) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    if (!isAdded()) return;
+                    hideLoading();
                     Toast.makeText(getContext(),
-                            "Failed to load doctors: " + error.getMessage(),
-                            Toast.LENGTH_SHORT).show();
+                            "Failed to load doctors", Toast.LENGTH_SHORT).show();
                 }
-            }
-        });
+            });
     }
 
-    // ─── Specialty Chips ─────────────────────────────────────────────────────────
+    // ── Specialty Chips ───────────────────────────────────────────────────────
 
     private void buildSpecialtyChips(List<Doctor> doctors) {
-        if (getContext() == null) return;
+        if (!isAdded() || getContext() == null) return;
         specialtyChipGroup.removeAllViews();
 
         List<String> specialties = new ArrayList<>();
         specialties.add("All");
         for (Doctor d : doctors) {
-            // Only include specialties of available doctors
-            if (d.isAvailable && d.specialization != null && !specialties.contains(d.specialization)) {
+            if (d.isAvailable && d.specialization != null
+                    && !specialties.contains(d.specialization))
                 specialties.add(d.specialization);
-            }
         }
 
-        for (String specialty : specialties) {
-            Chip chip = new Chip(getContext());
-            chip.setText(specialty);
+        for (String s : specialties) {
+            Chip chip = new Chip(requireContext());
+            chip.setText(s);
             chip.setCheckable(true);
             chip.setClickable(true);
-            chip.setChecked(specialty.equals(activeChip));
-
-            chip.setOnClickListener(v -> {
-                activeChip = specialty;
-                applyFilters();
-            });
-
+            chip.setChecked(s.equals(activeChip));
+            chip.setOnClickListener(v -> { activeChip = s; applyFilters(); });
             specialtyChipGroup.addView(chip);
         }
     }
 
-    // ─── Search ──────────────────────────────────────────────────────────────────
+    // ── Search ────────────────────────────────────────────────────────────────
 
     private void setupSearch() {
         searchEditText.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void beforeTextChanged(CharSequence s, int st, int c, int a) {}
             @Override public void afterTextChanged(Editable s) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            @Override public void onTextChanged(CharSequence s, int st, int b, int c) {
                 applyFilters();
             }
         });
     }
 
-    // ─── Combined Filter ─────────────────────────────────────────────────────────
-
     private void applyFilters() {
         String query = searchEditText.getText().toString().toLowerCase().trim();
-        doctorsAdapter.applyFilters(activeChip, query);
+        int count = doctorsAdapter.applyFilters(activeChip, query);
+        updateResultsCount(count);
+        if (count == 0 && doctorList.size() > 0) showEmpty();
+        else if (count > 0) showList();
     }
 
-    // ─── Navigate to Doctor Profile ──────────────────────────────────────────────
+    private void updateResultsCount(int count) {
+        if (tvResultsCount != null) {
+            tvResultsCount.setText(count + " doctor" + (count == 1 ? "" : "s") + " available");
+        }
+    }
+
+    // ── State helpers ─────────────────────────────────────────────────────────
+
+    private void showLoading() {
+        loadingSpinner.setVisibility(View.VISIBLE);
+        doctorsRecyclerView.setVisibility(View.GONE);
+        emptyState.setVisibility(View.GONE);
+    }
+
+    private void hideLoading() {
+        loadingSpinner.setVisibility(View.GONE);
+    }
+
+    private void showList() {
+        doctorsRecyclerView.setVisibility(View.VISIBLE);
+        emptyState.setVisibility(View.GONE);
+    }
+
+    private void showEmpty() {
+        doctorsRecyclerView.setVisibility(View.GONE);
+        emptyState.setVisibility(View.VISIBLE);
+    }
+
+    // ── Open doctor profile ───────────────────────────────────────────────────
 
     private void openDoctorProfile(Doctor doctor) {
         Intent intent = new Intent(getActivity(), DoctorProfileActivity.class);
@@ -172,58 +188,47 @@ public class FindFragment extends Fragment {
         intent.putExtra("doctor_available_days",     doctor.availableDays);
         intent.putExtra("doctor_consultation_hours", doctor.consultationHours);
         intent.putExtra("doctor_consultation_fee",   doctor.consultationFee);
-        intent.putExtra("doctor_email",              doctor.email);
-        intent.putExtra("doctor_prc_license",        doctor.prcLicense);
-        intent.putExtra("doctor_years_experience",   doctor.yearsOfExperience);
         startActivity(intent);
     }
 
-    // ─── Adapter ─────────────────────────────────────────────────────────────────
+    // ════════════════════════════════════════════════════════════════════════
+    //  Inner Adapter
+    // ════════════════════════════════════════════════════════════════════════
 
     public class DoctorsAdapter extends RecyclerView.Adapter<DoctorsAdapter.DoctorViewHolder> {
 
-        private List<Doctor> displayList = new ArrayList<>();
-        private List<Doctor> fullList    = new ArrayList<>();
+        private final List<Doctor> fullList    = new ArrayList<>();
+        private final List<Doctor> displayList = new ArrayList<>();
 
         public DoctorsAdapter(List<Doctor> initial) {
-            this.fullList    = new ArrayList<>(initial);
-            this.displayList = new ArrayList<>(initial);
+            fullList.addAll(initial);
+            displayList.addAll(initial);
         }
 
         public void setFullList(List<Doctor> list) {
-            this.fullList    = new ArrayList<>(list);
-            this.displayList = new ArrayList<>(list);
+            fullList.clear(); fullList.addAll(list);
+            displayList.clear(); displayList.addAll(list);
             notifyDataSetChanged();
         }
 
-        public void applyFilters(String specialty, String query) {
+        /** Returns count of items shown after filtering */
+        public int applyFilters(String specialty, String query) {
             displayList.clear();
+            for (Doctor d : fullList) {
+                if (!d.isAvailable) continue;
 
-            for (Doctor doctor : fullList) {
+                boolean matchChip   = specialty.equals("All") ||
+                        (d.specialization != null && d.specialization.equalsIgnoreCase(specialty));
+                boolean matchSearch = query.isEmpty() ||
+                        (d.fullName      != null && d.fullName.toLowerCase().contains(query)) ||
+                        (d.specialization!= null && d.specialization.toLowerCase().contains(query))||
+                        (d.clinicName    != null && d.clinicName.toLowerCase().contains(query)) ||
+                        (d.location      != null && d.location.toLowerCase().contains(query));
 
-                // ── Hide doctors that are not available ──────────────────────
-                if (!doctor.isAvailable) continue;
-
-                boolean matchesChip = specialty.equals("All") ||
-                        (doctor.specialization != null &&
-                                doctor.specialization.equalsIgnoreCase(specialty));
-
-                boolean matchesSearch = query.isEmpty() ||
-                        (doctor.fullName != null &&
-                                doctor.fullName.toLowerCase().contains(query)) ||
-                        (doctor.specialization != null &&
-                                doctor.specialization.toLowerCase().contains(query)) ||
-                        (doctor.clinicName != null &&
-                                doctor.clinicName.toLowerCase().contains(query)) ||
-                        (doctor.location != null &&
-                                doctor.location.toLowerCase().contains(query));
-
-                if (matchesChip && matchesSearch) {
-                    displayList.add(doctor);
-                }
+                if (matchChip && matchSearch) displayList.add(d);
             }
-
             notifyDataSetChanged();
+            return displayList.size();
         }
 
         @NonNull
@@ -235,54 +240,71 @@ public class FindFragment extends Fragment {
         }
 
         @Override
-        public void onBindViewHolder(@NonNull DoctorViewHolder holder, int position) {
-            Doctor doctor = displayList.get(position);
+        public void onBindViewHolder(@NonNull DoctorViewHolder h, int position) {
+            Doctor d = displayList.get(position);
 
             // Name
-            holder.nameText.setText(
-                    doctor.fullName != null ? doctor.fullName : "Unknown Doctor");
+            String name = d.fullName != null ? d.fullName : "Unknown Doctor";
+            h.nameText.setText(name.startsWith("Dr.") ? name : "Dr. " + name);
+
+            // Initials for avatar
+            h.initialsText.setText(getInitials(d.fullName));
 
             // Specialty • Clinic
-            String specialtyLine = "";
-            if (doctor.specialization != null) specialtyLine += doctor.specialization;
-            if (doctor.clinicName != null)      specialtyLine += " • " + doctor.clinicName;
-            holder.specialtyText.setText(specialtyLine);
+            String line = "";
+            if (d.specialization != null) line += d.specialization;
+            if (d.clinicName     != null) line += (line.isEmpty() ? "" : " • ") + d.clinicName;
+            h.specialtyText.setText(line.isEmpty() ? "General Practitioner" : line);
 
             // Location
-            holder.distanceText.setText(
-                    doctor.location != null ? "📍 " + doctor.location : "");
+            h.locationText.setText(d.location != null ? d.location : "—");
 
-            // Availability status — always "Available" here since we filter out unavailable
-            holder.statusDot.setBackgroundResource(R.drawable.bg_status_available);
-            holder.statusText.setText("Available");
-            holder.statusText.setTextColor(
-                    getResources().getColor(R.color.status_available));
+            // Available days
+            if (h.daysText != null) {
+                h.daysText.setText(d.availableDays != null ? "📅 " + d.availableDays : "");
+            }
 
-            // Click listeners
-            holder.bookButton.setOnClickListener(v -> openDoctorProfile(doctor));
-            holder.itemView.setOnClickListener(v -> openDoctorProfile(doctor));
+            // Fee
+            h.feeText.setText(d.consultationFee != null && !d.consultationFee.isEmpty()
+                    ? "₱" + d.consultationFee : "");
+
+            // Status — always available here (we filter out unavailable above)
+            h.statusDot.setBackgroundResource(R.drawable.bg_status_available);
+            h.statusText.setText("Available");
+            if (getContext() != null)
+                h.statusText.setTextColor(
+                        getContext().getResources().getColor(R.color.status_available));
+
+            h.bookButton.setOnClickListener(v -> openDoctorProfile(d));
+            h.itemView.setOnClickListener(v -> openDoctorProfile(d));
         }
 
-        @Override
-        public int getItemCount() {
-            return displayList.size();
-        }
+        @Override public int getItemCount() { return displayList.size(); }
 
-        // ─── ViewHolder ──────────────────────────────────────────────────────────
+        private String getInitials(String name) {
+            if (name == null || name.isEmpty()) return "?";
+            String[] parts = name.trim().split("\\s+");
+            if (parts.length == 1) return String.valueOf(Character.toUpperCase(parts[0].charAt(0)));
+            return String.valueOf(Character.toUpperCase(parts[0].charAt(0)))
+                 + String.valueOf(Character.toUpperCase(parts[parts.length - 1].charAt(0)));
+        }
 
         class DoctorViewHolder extends RecyclerView.ViewHolder {
-            TextView nameText, specialtyText, experienceText, distanceText, statusText;
+            TextView nameText, specialtyText, locationText, daysText, statusText, initialsText, feeText;
             View     statusDot;
-            CardView bookButton;
+            com.google.android.material.button.MaterialButton bookButton;
 
-            public DoctorViewHolder(@NonNull View itemView) {
-                super(itemView);
-                nameText       = itemView.findViewById(R.id.doctor_name);
-                specialtyText  = itemView.findViewById(R.id.doctor_specialty);
-                distanceText   = itemView.findViewById(R.id.doctor_distance);
-                statusText     = itemView.findViewById(R.id.doctor_status);
-                statusDot      = itemView.findViewById(R.id.status_dot);
-                bookButton     = itemView.findViewById(R.id.book_button);
+            DoctorViewHolder(@NonNull View v) {
+                super(v);
+                nameText      = v.findViewById(R.id.doctor_name);
+                initialsText  = v.findViewById(R.id.doctor_initials);
+                specialtyText = v.findViewById(R.id.doctor_specialty);
+                locationText  = v.findViewById(R.id.doctor_distance);
+                daysText      = v.findViewById(R.id.doctor_days);
+                statusText    = v.findViewById(R.id.doctor_status);
+                statusDot     = v.findViewById(R.id.status_dot);
+                feeText       = v.findViewById(R.id.doctor_fee);
+                bookButton    = v.findViewById(R.id.book_button);
             }
         }
     }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- FIX: was @color/white — now @color/card_bg -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/white" />
+    <solid android:color="@color/card_bg" />
     <corners android:radius="16dp" />
 </shape>

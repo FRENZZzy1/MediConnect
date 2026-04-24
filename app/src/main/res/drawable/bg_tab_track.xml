@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Background for the custom 3-segment appointment filter track.
+    Lives in the teal header, so we use a semi-transparent white
+    that reads well on teal in light mode AND on dark teal in dark mode.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#22FFFFFF" />
+    <corners android:radius="12dp" />
+</shape>

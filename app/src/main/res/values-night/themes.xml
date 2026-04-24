@@ -1,19 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme - Dark Mode -->
+
+    <!--
+        Dark mode theme.
+        Key additions vs the original values/themes.xml:
+        • statusBarColor         → dashboard_bg so the status bar goes dark
+        • navigationBarColor     → card_bg so the system nav bar goes dark
+        • windowLightStatusBar   → false = white icons on dark status bar
+        • windowLightNavigationBar → false = white icons on dark nav bar
+        Without these the top and bottom system bars stay light even with
+        DayNight theme, which is the "still white" issue users were seeing.
+    -->
     <style name="Base.Theme.MediConnect" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Dark Theme Customization -->
+
+        <!-- Brand -->
         <item name="colorPrimary">@color/primary_teal</item>
-        <item name="colorOnPrimary">@color/text_primary</item>
+        <item name="colorOnPrimary">@color/white</item>
         <item name="colorPrimaryContainer">@color/primary_teal_dark</item>
         <item name="colorOnPrimaryContainer">@color/primary_teal_light</item>
 
-        <!-- Surface Colors (Dark) -->
+        <!-- Surfaces -->
         <item name="android:colorBackground">@color/dashboard_bg</item>
         <item name="colorSurface">@color/card_bg</item>
         <item name="colorOnSurface">@color/text_primary</item>
 
-        <!-- Error Colors -->
+        <!-- Error -->
         <item name="colorError">@color/status_critical</item>
         <item name="colorOnError">@color/white</item>
+
+        <!-- System bars -->
+        <item name="android:statusBarColor">@color/dashboard_bg</item>
+        <item name="android:navigationBarColor">@color/card_bg</item>
+        <item name="android:windowLightStatusBar"     tools:targetApi="m">false</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">false</item>
+
     </style>
+
+    <style name="Theme.MediConnect" parent="Base.Theme.MediConnect" />
+
 </resources>

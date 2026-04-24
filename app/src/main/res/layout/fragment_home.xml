@@ -1,40 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  IMPROVED DASHBOARD LAYOUT - Main Screen
-
-  IMPROVEMENTS:
-  - Fixed bottom navigation icon colors (teal when active, gray when inactive)
-  - Better organization and spacing
-  - Added smooth scroll animations
-  - Optimized layout hierarchy
-  - Fixed status dot drawable
-  - Enhanced visual consistency
-
-  FEATURES:
-  - User profile header with greeting
-  - Health status card with gradient
-  - Quick action buttons (Video, AI Chat, Find Nearby, Records)
-  - Upcoming appointments with join button
-  - Recent activity timeline
-  - Daily health tips (horizontal scroll)
-  - Medication reminders
-  - Bottom navigation (5 tabs)
--->
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/dashboard_bg"
-    tools:context=".HomeFragment">
+    android:background="@color/dashboard_bg">
 
-    <!-- Main Scrollable Content -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true"
         android:scrollbars="none"
         android:overScrollMode="never">
 
@@ -44,151 +18,262 @@
             android:orientation="vertical"
             android:paddingBottom="100dp">
 
-            <!-- ═══════════════════════════════════════════ -->
-            <!-- HEADER SECTION - User Profile -->
-            <!-- ═══════════════════════════════════════════ -->
+            <!-- ══ HEADER ══ -->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_header_rounded_bottom"
-                android:padding="20dp"
-                android:elevation="4dp">
+                android:paddingHorizontal="20dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="24dp">
 
-                <!-- User Avatar and Info -->
                 <LinearLayout
                     android:id="@+id/user_info_container"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:layout_centerVertical="true">
 
-                    <!-- User Avatar Circle -->
                     <androidx.cardview.widget.CardView
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        app:cardCornerRadius="28dp"
-                        app:cardElevation="4dp">
-
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
+                        app:cardCornerRadius="26dp"
+                        app:cardElevation="3dp">
                         <TextView
                             android:id="@+id/user_avatar"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:background="@color/white"
+                            android:background="@color/primary_teal_dark"
                             android:gravity="center"
                             android:text="M"
-                            android:textColor="#0097A7"
-                            android:textSize="24sp"
+                            android:textColor="@color/white"
+                            android:textSize="22sp"
                             android:textStyle="bold" />
                     </androidx.cardview.widget.CardView>
 
-                    <!-- User Info -->
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         android:orientation="vertical">
-
                         <TextView
                             android:id="@+id/greeting_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:alpha="0.9"
                             android:text="Good morning,"
-                            android:textColor="@color/white"
+                            android:textColor="#B3FFFFFF"
                             android:textSize="13sp" />
-
                         <TextView
                             android:id="@+id/user_name"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Maria Santos"
+                            android:text="Loading…"
                             android:textColor="@color/white"
-                            android:textSize="20sp"
+                            android:textSize="19sp"
                             android:textStyle="bold" />
                     </LinearLayout>
                 </LinearLayout>
 
-                <!-- Settings Icon -->
-                <ImageView
-                    android:id="@+id/settings_icon"
-                    android:layout_width="35dp"
-                    android:layout_height="35dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:contentDescription="Settings"
-                    android:src="@drawable/settings"
-                    android:padding="4dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    app:tint="@color/white" />
             </RelativeLayout>
 
-            <!-- ═══════════════════════════════════════════ -->
-            <!-- HEALTH STATUS CARD -->
-            <!-- ═══════════════════════════════════════════ -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="20dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="3dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_health_status"
-                    android:orientation="vertical"
-                    android:padding="18dp">
-
-                    <!-- Status Badge -->
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_card_rounded"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:paddingStart="14dp"
-                        android:paddingTop="8dp"
-                        android:paddingEnd="14dp"
-                        android:paddingBottom="8dp">
-
-                        <!-- Status Dot -->
-                        <View
-                            android:layout_width="10dp"
-                            android:layout_height="10dp"
-                            android:background="@drawable/bg_status_dot" />
-
-                        <TextView
-                            android:id="@+id/health_status_text"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="10dp"
-                            android:text="Health Status - Normal"
-                            android:textColor="@color/text_primary"
-                            android:textSize="13sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-
-                    <!-- Last Check Info -->
-                    <TextView
-                        android:id="@+id/last_check_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:alpha="0.9"
-                        android:text="Last check: 3 days ago"
-                        android:textColor="@color/white"
-                        android:textSize="12sp" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- ═══════════════════════════════════════════ -->
-            <!-- QUICK ACTIONS SECTION -->
-            <!-- ═══════════════════════════════════════════ -->
+            <!-- ══ UPCOMING APPOINTMENT ══ -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="22dp"
+                android:layout_marginEnd="20dp"
+                android:letterSpacing="0.08"
+                android:text="UPCOMING APPOINTMENT"
+                android:textColor="@color/text_tertiary"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <!-- Appointment Card — hidden until Firebase returns data -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/appointment_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="12dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:visibility="gone"
+                app:cardBackgroundColor="@color/card_bg"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <!-- Type + Status row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:id="@+id/appt_type_badge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Consultation"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/primary_teal"
+                            android:background="@drawable/bg_type_badge"
+                            android:paddingHorizontal="10dp"
+                            android:paddingVertical="4dp" />
+
+                        <View android:layout_width="0dp" android:layout_height="0dp" android:layout_weight="1"/>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+                            <View
+                                android:id="@+id/appt_status_dot"
+                                android:layout_width="8dp"
+                                android:layout_height="8dp"
+                                android:background="@drawable/bg_status_available" />
+                            <TextView
+                                android:id="@+id/appt_status_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="6dp"
+                                android:text="Confirmed"
+                                android:textColor="@color/status_available"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Doctor name -->
+                    <TextView
+                        android:id="@+id/appointment_doctor"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Dr. —"
+                        android:textColor="@color/text_primary"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
+                    <!-- Specialty -->
+                    <TextView
+                        android:id="@+id/appointment_specialty"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:text="Specialist"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="13sp" />
+
+                    <!-- Date + Time -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:src="@drawable/ic_calendar"
+                            app:tint="@color/primary_teal" />
+
+                        <TextView
+                            android:id="@+id/appointment_time"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_weight="1"
+                            android:text="—"
+                            android:textColor="@color/text_primary"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/join_button"
+                            style="@style/Widget.Material3.Button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:text="Join"
+                            android:textSize="13sp"
+                            app:backgroundTint="@color/primary_teal"
+                            app:cornerRadius="18dp" />
+                    </LinearLayout>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Empty appointment state -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/appointment_empty_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="12dp"
+                android:visibility="gone"
+                app:cardBackgroundColor="@color/card_bg"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="18dp"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="No upcoming appointments.\nBook a doctor to get started."
+                        android:textColor="@color/text_secondary"
+                        android:textSize="14sp"
+                        android:lineSpacingExtra="3dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_book_now"
+                        style="@style/Widget.Material3.Button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:text="Book"
+                        android:textSize="13sp"
+                        app:backgroundTint="@color/primary_teal"
+                        app:cornerRadius="18dp" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Loading skeleton for appointment -->
+            <FrameLayout
+                android:id="@+id/appointment_loading"
+                android:layout_width="match_parent"
+                android:layout_height="90dp"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="12dp"
+                android:visibility="visible">
+                <ProgressBar
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center"
+                    android:indeterminateTint="@color/primary_teal" />
+            </FrameLayout>
+
+            <!-- ══ QUICK ACTIONS ══ -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="24dp"
                 android:layout_marginEnd="20dp"
                 android:letterSpacing="0.08"
                 android:text="QUICK ACTIONS"
@@ -196,17 +281,14 @@
                 android:textSize="11sp"
                 android:textStyle="bold" />
 
-            <!-- Quick Actions Grid -->
             <GridLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="14dp"
-                android:layout_marginEnd="20dp"
-                android:alignmentMode="alignBounds"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="12dp"
                 android:columnCount="2"
-                android:columnOrderPreserved="false"
-                android:rowCount="2">
+                android:rowCount="2"
+                android:alignmentMode="alignBounds">
 
                 <!-- Video Consult -->
                 <androidx.cardview.widget.CardView
@@ -217,11 +299,12 @@
                     android:layout_column="0"
                     android:layout_columnWeight="1"
                     android:layout_marginEnd="8dp"
-                    android:layout_marginBottom="14dp"
+                    android:layout_marginBottom="12dp"
                     android:clickable="true"
                     android:focusable="true"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    app:cardCornerRadius="14dp"
+                    android:foreground="?attr/selectableItemBackground"
+                    app:cardBackgroundColor="@color/card_bg"
+                    app:cardCornerRadius="16dp"
                     app:cardElevation="2dp">
 
                     <LinearLayout
@@ -231,27 +314,32 @@
                         android:orientation="vertical"
                         android:padding="18dp">
 
-                        <!-- Icon Container -->
-                        <View
-                            android:layout_width="52dp"
-                            android:layout_height="52dp"
+                        <FrameLayout
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
                             android:background="@drawable/bg_icon_circle"
-                            android:backgroundTint="@color/icon_bg_teal" />
+                            android:backgroundTint="@color/icon_bg_teal">
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/videocamera"
+                                app:tint="@color/action_video" />
+                        </FrameLayout>
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="14dp"
+                            android:layout_marginTop="12dp"
                             android:gravity="center"
                             android:text="Video Consult"
                             android:textColor="@color/text_primary"
-                            android:textSize="14sp"
+                            android:textSize="13sp"
                             android:textStyle="bold" />
-
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="5dp"
+                            android:layout_marginTop="4dp"
                             android:gravity="center"
                             android:text="Start now"
                             android:textColor="@color/text_tertiary"
@@ -268,11 +356,12 @@
                     android:layout_column="1"
                     android:layout_columnWeight="1"
                     android:layout_marginStart="8dp"
-                    android:layout_marginBottom="14dp"
+                    android:layout_marginBottom="12dp"
                     android:clickable="true"
                     android:focusable="true"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    app:cardCornerRadius="14dp"
+                    android:foreground="?attr/selectableItemBackground"
+                    app:cardBackgroundColor="@color/card_bg"
+                    app:cardCornerRadius="16dp"
                     app:cardElevation="2dp">
 
                     <LinearLayout
@@ -282,26 +371,32 @@
                         android:orientation="vertical"
                         android:padding="18dp">
 
-                        <View
-                            android:layout_width="52dp"
-                            android:layout_height="52dp"
+                        <FrameLayout
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
                             android:background="@drawable/bg_icon_circle"
-                            android:backgroundTint="@color/icon_bg_purple" />
+                            android:backgroundTint="@color/icon_bg_purple">
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/userdoc"
+                                app:tint="@color/action_ai" />
+                        </FrameLayout>
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="14dp"
+                            android:layout_marginTop="12dp"
                             android:gravity="center"
                             android:text="AI Medical Q&amp;A"
                             android:textColor="@color/text_primary"
-                            android:textSize="14sp"
+                            android:textSize="13sp"
                             android:textStyle="bold" />
-
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="5dp"
+                            android:layout_marginTop="4dp"
                             android:gravity="center"
                             android:text="Ask anything"
                             android:textColor="@color/text_tertiary"
@@ -320,8 +415,9 @@
                     android:layout_marginEnd="8dp"
                     android:clickable="true"
                     android:focusable="true"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    app:cardCornerRadius="14dp"
+                    android:foreground="?attr/selectableItemBackground"
+                    app:cardBackgroundColor="@color/card_bg"
+                    app:cardCornerRadius="16dp"
                     app:cardElevation="2dp">
 
                     <LinearLayout
@@ -331,26 +427,32 @@
                         android:orientation="vertical"
                         android:padding="18dp">
 
-                        <View
-                            android:layout_width="52dp"
-                            android:layout_height="52dp"
+                        <FrameLayout
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
                             android:background="@drawable/bg_icon_circle"
-                            android:backgroundTint="@color/icon_bg_orange" />
+                            android:backgroundTint="@color/icon_bg_orange">
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/marker"
+                                app:tint="@color/action_nearby" />
+                        </FrameLayout>
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="14dp"
+                            android:layout_marginTop="12dp"
                             android:gravity="center"
                             android:text="Find Nearby"
                             android:textColor="@color/text_primary"
-                            android:textSize="14sp"
+                            android:textSize="13sp"
                             android:textStyle="bold" />
-
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="5dp"
+                            android:layout_marginTop="4dp"
                             android:gravity="center"
                             android:text="Nearest clinics"
                             android:textColor="@color/text_tertiary"
@@ -369,8 +471,9 @@
                     android:layout_marginStart="8dp"
                     android:clickable="true"
                     android:focusable="true"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    app:cardCornerRadius="14dp"
+                    android:foreground="?attr/selectableItemBackground"
+                    app:cardBackgroundColor="@color/card_bg"
+                    app:cardCornerRadius="16dp"
                     app:cardElevation="2dp">
 
                     <LinearLayout
@@ -380,26 +483,32 @@
                         android:orientation="vertical"
                         android:padding="18dp">
 
-                        <View
-                            android:layout_width="52dp"
-                            android:layout_height="52dp"
+                        <FrameLayout
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
                             android:background="@drawable/bg_icon_circle"
-                            android:backgroundTint="@color/icon_bg_blue" />
+                            android:backgroundTint="@color/icon_bg_blue">
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/clipboard"
+                                app:tint="@color/action_records" />
+                        </FrameLayout>
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="14dp"
+                            android:layout_marginTop="12dp"
                             android:gravity="center"
                             android:text="My Records"
                             android:textColor="@color/text_primary"
-                            android:textSize="14sp"
+                            android:textSize="13sp"
                             android:textStyle="bold" />
-
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="5dp"
+                            android:layout_marginTop="4dp"
                             android:gravity="center"
                             android:text="View history"
                             android:textColor="@color/text_tertiary"
@@ -408,306 +517,29 @@
                 </androidx.cardview.widget.CardView>
             </GridLayout>
 
-            <!-- ═══════════════════════════════════════════ -->
-            <!-- UPCOMING APPOINTMENTS SECTION -->
-            <!-- ═══════════════════════════════════════════ -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="24dp"
-                android:layout_marginEnd="20dp"
-                android:letterSpacing="0.08"
-                android:text="UPCOMING APPOINTMENT"
-                android:textColor="@color/text_tertiary"
-                android:textSize="11sp"
-                android:textStyle="bold" />
-
-            <!-- Appointment Card -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/appointment_card"
+            <!-- ══ DAILY HEALTH TIP ══ -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="14dp"
-                android:layout_marginEnd="20dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?android:attr/selectableItemBackground"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="2dp">
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
-
-                    <!-- Doctor Avatar -->
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="52dp"
-                        android:layout_height="52dp"
-                        app:cardCornerRadius="26dp"
-                        app:cardElevation="0dp">
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="@color/icon_bg_teal" />
-                    </androidx.cardview.widget.CardView>
-
-                    <!-- Appointment Info -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="14dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/appointment_title"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="GP TELECALL"
-                            android:textColor="@color/primary_teal"
-                            android:textSize="11sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/appointment_doctor"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="6dp"
-                            android:text="Dr. Ricardo A. Cardiologist"
-                            android:textColor="@color/text_primary"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/appointment_time"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="5dp"
-                            android:text="Today - 2:00 PM"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="13sp" />
-                    </LinearLayout>
-
-                    <!-- Join Button -->
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/join_button"
-                        style="@style/Widget.Material3.Button.TonalButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:text="Join"
-                        android:textSize="13sp"
-                        app:cornerRadius="10dp" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- ═══════════════════════════════════════════ -->
-            <!-- RECENT ACTIVITY SECTION -->
-            <!-- ═══════════════════════════════════════════ -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="28dp"
-                android:layout_marginEnd="20dp"
-                android:letterSpacing="0.08"
-                android:text="RECENT ACTIVITY"
-                android:textColor="@color/text_tertiary"
-                android:textSize="11sp"
-                android:textStyle="bold" />
-
-            <!-- Activity Item 1 -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="14dp"
-                android:layout_marginEnd="20dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
-
-                    <View
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
-                        android:background="@drawable/bg_icon_circle"
-                        android:backgroundTint="@color/icon_bg_teal" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="14dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Blood Pressure Check"
-                            android:textColor="@color/text_primary"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="120/80 mmHg - Normal"
-                            android:textColor="@color/status_normal"
-                            android:textSize="13sp" />
-                    </LinearLayout>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="2h ago"
-                        android:textColor="@color/text_tertiary"
-                        android:textSize="12sp" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- Activity Item 2 -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="20dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
-
-                    <View
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
-                        android:background="@drawable/bg_icon_circle"
-                        android:backgroundTint="@color/icon_bg_purple" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="14dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="AI Consultation"
-                            android:textColor="@color/text_primary"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="Asked about headache symptoms"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="13sp" />
-                    </LinearLayout>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Yesterday"
-                        android:textColor="@color/text_tertiary"
-                        android:textSize="12sp" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- Activity Item 3 -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="20dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
-
-                    <View
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
-                        android:background="@drawable/bg_icon_circle"
-                        android:backgroundTint="@color/icon_bg_orange" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="14dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Prescription Refilled"
-                            android:textColor="@color/text_primary"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="Amoxicillin 500mg"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="13sp" />
-                    </LinearLayout>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="3 days ago"
-                        android:textColor="@color/text_tertiary"
-                        android:textSize="12sp" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- ═══════════════════════════════════════════ -->
-            <!-- HEALTH TIPS SECTION -->
-            <!-- ═══════════════════════════════════════════ -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="28dp"
-                android:layout_marginEnd="20dp"
-                android:letterSpacing="0.08"
-                android:text="DAILY HEALTH TIPS"
-                android:textColor="@color/text_tertiary"
-                android:textSize="11sp"
-                android:textStyle="bold" />
+                    android:layout_weight="1"
+                    android:letterSpacing="0.08"
+                    android:text="DAILY HEALTH TIPS"
+                    android:textColor="@color/text_tertiary"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
 
             <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
+                android:layout_marginTop="12dp"
                 android:scrollbars="none"
                 android:overScrollMode="never">
 
@@ -718,221 +550,75 @@
                     android:paddingStart="20dp"
                     android:paddingEnd="20dp">
 
-                    <!-- Tip Card 1 -->
+                    <!-- Tip 1 -->
                     <androidx.cardview.widget.CardView
-                        android:layout_width="290dp"
+                        android:layout_width="260dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="14dp"
-                        app:cardCornerRadius="14dp"
+                        android:layout_marginEnd="12dp"
+                        app:cardBackgroundColor="@color/card_bg"
+                        app:cardCornerRadius="16dp"
                         app:cardElevation="2dp">
-
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:padding="18dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                            android:padding="16dp">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                                 android:text="💧 Stay Hydrated"
-                                android:textColor="@color/primary_teal"
-                                android:textSize="16sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="10dp"
-                                android:text="Drink at least 8 glasses of water daily to maintain optimal health and energy levels throughout the day."
-                                android:textColor="@color/text_secondary"
-                                android:textSize="13sp"
-                                android:lineSpacingExtra="2dp" />
+                                android:textColor="@color/primary_teal" android:textSize="15sp" android:textStyle="bold" />
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="Drink at least 8 glasses of water daily to maintain optimal energy and health."
+                                android:textColor="@color/text_secondary" android:textSize="13sp" android:lineSpacingExtra="2dp" />
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
 
-                    <!-- Tip Card 2 -->
+                    <!-- Tip 2 -->
                     <androidx.cardview.widget.CardView
-                        android:layout_width="290dp"
+                        android:layout_width="260dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="14dp"
-                        app:cardCornerRadius="14dp"
+                        android:layout_marginEnd="12dp"
+                        app:cardBackgroundColor="@color/card_bg"
+                        app:cardCornerRadius="16dp"
                         app:cardElevation="2dp">
-
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:padding="18dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                            android:padding="16dp">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                                 android:text="🚶 Daily Walk"
-                                android:textColor="@color/primary_teal"
-                                android:textSize="16sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="10dp"
-                                android:text="A 30-minute walk can improve cardiovascular health, boost your mood, and increase overall fitness."
-                                android:textColor="@color/text_secondary"
-                                android:textSize="13sp"
-                                android:lineSpacingExtra="2dp" />
+                                android:textColor="@color/primary_teal" android:textSize="15sp" android:textStyle="bold" />
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="A 30-minute walk improves cardiovascular health and boosts your mood."
+                                android:textColor="@color/text_secondary" android:textSize="13sp" android:lineSpacingExtra="2dp" />
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
 
-                    <!-- Tip Card 3 -->
+                    <!-- Tip 3 -->
                     <androidx.cardview.widget.CardView
-                        android:layout_width="290dp"
+                        android:layout_width="260dp"
                         android:layout_height="wrap_content"
-                        app:cardCornerRadius="14dp"
+                        app:cardBackgroundColor="@color/card_bg"
+                        app:cardCornerRadius="16dp"
                         app:cardElevation="2dp">
-
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:padding="18dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                            android:padding="16dp">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                                 android:text="😴 Quality Sleep"
-                                android:textColor="@color/primary_teal"
-                                android:textSize="16sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="10dp"
-                                android:text="Aim for 7-9 hours of sleep each night. Good sleep improves immunity, memory, and mental clarity."
-                                android:textColor="@color/text_secondary"
-                                android:textSize="13sp"
-                                android:lineSpacingExtra="2dp" />
+                                android:textColor="@color/primary_teal" android:textSize="15sp" android:textStyle="bold" />
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="Aim for 7–9 hours of sleep. Good sleep improves immunity and mental clarity."
+                                android:textColor="@color/text_secondary" android:textSize="13sp" android:lineSpacingExtra="2dp" />
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
                 </LinearLayout>
             </HorizontalScrollView>
-
-            <!-- ═══════════════════════════════════════════ -->
-            <!-- MEDICATION REMINDERS SECTION -->
-            <!-- ═══════════════════════════════════════════ -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="28dp"
-                android:layout_marginEnd="20dp"
-                android:letterSpacing="0.08"
-                android:text="MEDICATION REMINDERS"
-                android:textColor="@color/text_tertiary"
-                android:textSize="11sp"
-                android:textStyle="bold" />
-
-            <!-- Medication Card 1 -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="14dp"
-                android:layout_marginEnd="20dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Vitamin D Supplement"
-                            android:textColor="@color/text_primary"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="5dp"
-                            android:text="After breakfast • 1 tablet"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="13sp" />
-                    </LinearLayout>
-
-                    <com.google.android.material.button.MaterialButton
-                        style="@style/Widget.Material3.Button.TextButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Take"
-                        android:textSize="13sp"
-                        app:cornerRadius="8dp" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- Medication Card 2 -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginBottom="20dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Blood Pressure Medication"
-                            android:textColor="@color/text_primary"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="5dp"
-                            android:text="8:00 PM • 1 tablet"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="13sp" />
-                    </LinearLayout>
-
-                    <com.google.android.material.button.MaterialButton
-                        style="@style/Widget.Material3.Button.TextButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Take"
-                        android:textSize="13sp"
-                        app:cornerRadius="8dp" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
