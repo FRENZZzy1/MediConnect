@@ -172,11 +172,34 @@ public class Consultation_Schedule extends AppCompatActivity {
         // Zego handles outgoing ring, the doctor's incoming popup,
         // accept/decline, and room join — nothing else needed on this side.
         ZegoSendCallInvitationButton btnVideoCall = card.findViewById(R.id.btnVideoCall);
+        TextView tvEnded = card.findViewById(R.id.tvEnded);
+
         if (btnVideoCall != null) {
-            List<ZegoUIKitUser> invitees = new ArrayList<>();
-            invitees.add(new ZegoUIKitUser(doctorId, displayName));
-            btnVideoCall.setInvitees(invitees);
-            btnVideoCall.setIsVideoCall(true);
+            if (isConsultationPast(date, time)) {
+                // Past the valid window — show "Ended"
+                btnVideoCall.setVisibility(View.GONE);
+                if (tvEnded != null) {
+                    tvEnded.setText("Ended");
+                    tvEnded.setTextColor(android.graphics.Color.parseColor("#9E9E9E"));
+                    tvEnded.setVisibility(View.VISIBLE);
+                }
+            } else if (isConsultationActive(date, time)) {
+                // Within the valid 1-hour window — show call button
+                btnVideoCall.setVisibility(View.VISIBLE);
+                List<ZegoUIKitUser> invitees = new ArrayList<>();
+                invitees.add(new ZegoUIKitUser(doctorId, displayName));
+                btnVideoCall.setInvitees(invitees);
+                btnVideoCall.setIsVideoCall(true);
+                if (tvEnded != null) tvEnded.setVisibility(View.GONE);
+            } else {
+                // Still in the future — show "Upcoming"
+                btnVideoCall.setVisibility(View.GONE);
+                if (tvEnded != null) {
+                    tvEnded.setText("Upcoming");
+                    tvEnded.setTextColor(android.graphics.Color.parseColor("#1ABCD6"));
+                    tvEnded.setVisibility(View.VISIBLE);
+                }
+            }
         }
 
         consultationContainer.addView(card);
@@ -188,5 +211,43 @@ public class Consultation_Schedule extends AppCompatActivity {
         ZegoUIKitPrebuiltCallService.unInit();
     }
 
+
+    // ADD THIS ABOVE nn():
+    private boolean isConsultationPast(String date, String time) {
+        try {
+            java.util.Date consultationDateTime = parseDateTime(date, time);
+            if (consultationDateTime == null) return false;
+            // "Ended" = more than 1 hour after scheduled time
+            java.util.Date endTime = new java.util.Date(consultationDateTime.getTime() + 60 * 60 * 1000);
+            return new java.util.Date().after(endTime);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private boolean isConsultationActive(String date, String time) {
+        try {
+            java.util.Date consultationDateTime = parseDateTime(date, time);
+            if (consultationDateTime == null) return false;
+            java.util.Date now = new java.util.Date();
+            java.util.Date endTime = new java.util.Date(consultationDateTime.getTime() + 60 * 60 * 1000);
+            // "Active" = now is on or after scheduled time AND before end time
+            return !now.before(consultationDateTime) && now.before(endTime);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private java.util.Date parseDateTime(String date, String time) {
+        try {
+            String dateTimeStr = nn(date).trim() + " " + nn(time).trim();
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(
+                    "yyyy-MM-dd hh:mm a", java.util.Locale.US);
+            sdf.setLenient(false);
+            return sdf.parse(dateTimeStr);
+        } catch (Exception e) {
+            return null;
+        }
+    }
     private static String nn(String s) { return s != null ? s : ""; }
 }
