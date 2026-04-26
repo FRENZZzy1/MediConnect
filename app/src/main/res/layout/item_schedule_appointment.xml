@@ -111,7 +111,7 @@
 
                     <!-- Doctor Name -->
                     <TextView
-                        android:id="@+id/tvDoctorName"
+                        android:id="@+id/tvPatientName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text=""
@@ -123,10 +123,10 @@
 
                     <!-- Doctor Specialty -->
                     <TextView
-                        android:id="@+id/tvDoctorSpecialty"
+                        android:id="@+id/tvAppointmentDate"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Cardiologist"
+                        android:text=""
                         android:textColor="#64748B"
                         android:textSize="11sp"
                         android:layout_marginTop="2dp"
@@ -160,37 +160,126 @@
                 android:layout_marginBottom="8dp"
                 android:background="#F1F5F9"/>
 
-            <!-- Notes row (only shown when notes exist) -->
+            <!-- Notes row -->
+            <LinearLayout
+                android:id="@+id/layoutNotes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone">
+
+                <!-- Notes label -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="📝 "
+                        android:textSize="11sp"/>
+
+                    <TextView
+                        android:id="@+id/tvNotes"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text=""
+                        android:textColor="#64748B"
+                        android:textSize="11sp"
+                        android:maxLines="2"
+                        android:ellipsize="end"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Detail rows: date + time -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:visibility="gone">
+                android:layout_marginBottom="6dp">
 
-                <TextView
-                    android:id="@+id/tvHospital"
+                <!-- Date -->
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text=""
-                    android:textColor="#64748B"
-                    android:textSize="11sp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="📅 "
+                        android:textSize="11sp"/>
+
+                    <TextView
+                        android:id="@+id/tvDate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="2025-01-01"
+                        android:textColor="#475569"
+                        android:textSize="11sp"/>
+
+                </LinearLayout>
+
+                <!-- Time -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🕐 "
+                        android:textSize="11sp"/>
+
+                    <TextView
+                        android:id="@+id/tvTimeDetail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="9:00 AM"
+                        android:textColor="#475569"
+                        android:textSize="11sp"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Appointment ID row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🔖 Ref: "
+                    android:textColor="#94A3B8"
+                    android:textSize="10sp"/>
+
+                <TextView
+                    android:id="@+id/tvAppointmentId"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="APT-00001"
+                    android:textColor="#94A3B8"
+                    android:textSize="10sp"
                     android:maxLines="1"
                     android:ellipsize="end"/>
-
-                <TextView
-                    android:id="@+id/tvNotes"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text=""
-                    android:textColor="#64748B"
-                    android:textSize="12sp"
-                    android:drawablePadding="6dp"
-                    android:maxLines="1"
-                    android:ellipsize="end"
-                    android:visibility="gone"/>
 
             </LinearLayout>
 
@@ -208,6 +297,7 @@
                     android:layout_marginEnd="5dp"/>
 
                 <TextView
+                    android:id="@+id/tvStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Confirmed"

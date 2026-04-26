@@ -43,6 +43,7 @@ public class DoctorPersonalProfile extends AppCompatActivity {
     private MaterialButton  btnSaveProfile, btnChangePassword;
     private SwitchMaterial  switchDarkMode;
     private BottomNavigationView bottomNav;
+    private MaterialButton btnLogout;
 
     // ── Firebase ───────────────────────────────────────────────────────────────
     private FirebaseAuth      mAuth;
@@ -72,6 +73,7 @@ public class DoctorPersonalProfile extends AppCompatActivity {
 
         btnSaveProfile.setOnClickListener(v -> saveProfile());
         btnChangePassword.setOnClickListener(v -> showChangePasswordDialog());
+        btnLogout.setOnClickListener(v -> showLogoutConfirmation());
 
         setupBottomNav();
     }
@@ -93,6 +95,7 @@ public class DoctorPersonalProfile extends AppCompatActivity {
         btnChangePassword   = findViewById(R.id.btnChangePassword);
         switchDarkMode      = findViewById(R.id.switchDarkMode);
         bottomNav           = findViewById(R.id.bottomNav);
+        btnLogout = findViewById(R.id.btnLogout);
     }
 
     // ─── Dark Mode ────────────────────────────────────────────────────────────
@@ -298,4 +301,21 @@ public class DoctorPersonalProfile extends AppCompatActivity {
             return false;
         });
     }
+
+    private void showLogoutConfirmation() {
+        new AlertDialog.Builder(this)
+                .setTitle("Logout")
+                .setMessage("Are you sure you want to logout?")
+                .setPositiveButton("Logout", (dialog, which) -> {
+                    mAuth.signOut();
+                    Intent intent = new Intent(this, Login.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+
 }

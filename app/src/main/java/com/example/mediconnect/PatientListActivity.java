@@ -47,7 +47,6 @@ public class PatientListActivity extends AppCompatActivity {
         tabLayout = findViewById(R.id.tabLayout);
         bottomNav = findViewById(R.id.bottomNav);
 
-        // ViewPager with 2 tabs
         viewPager.setAdapter(new PatientPagerAdapter(this));
 
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
@@ -96,7 +95,6 @@ public class PatientListActivity extends AppCompatActivity {
         @Override
         public View onCreateView(@NonNull LayoutInflater inflater,
                                  ViewGroup container, Bundle savedInstanceState) {
-            // Inline layout: RecyclerView + empty state
             View root = inflater.inflate(R.layout.fragment_patient_list, container, false);
             recyclerView = root.findViewById(R.id.rvPatients);
             layoutEmpty  = root.findViewById(R.id.layoutEmptyPatients);
@@ -118,18 +116,20 @@ public class PatientListActivity extends AppCompatActivity {
             FirebaseFirestore firestore = FirebaseFirestore.getInstance();
             String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
 
-            // Build query: confirmed appointments for this doctor
-            // Past  → date < today
-            // Current/Upcoming → date >= today
-            Query query = firestore.collection("appointments")
-                    .whereEqualTo("doctorId", user.getUid())
-                    .whereEqualTo("status", "confirmed");
+            Query query;
 
             if (past) {
-                query = query.whereLessThan("date", today)
+                // Past Patients — only "ended" status
+                query = firestore.collection("appointments")
+                        .whereEqualTo("doctorId", user.getUid())
+                        .whereEqualTo("status", "ended")
                         .orderBy("date", Query.Direction.DESCENDING);
             } else {
-                query = query.whereGreaterThanOrEqualTo("date", today)
+                // Upcoming / Current — confirmed appointments from today onwards
+                query = firestore.collection("appointments")
+                        .whereEqualTo("doctorId", user.getUid())
+                        .whereEqualTo("status", "confirmed")
+                        .whereGreaterThanOrEqualTo("date", today)
                         .orderBy("date", Query.Direction.ASCENDING);
             }
 
@@ -156,8 +156,6 @@ public class PatientListActivity extends AppCompatActivity {
                             item.time          = doc.getString("time");
                             item.type          = doc.getString("type");
                             item.status        = doc.getString("status");
-
-                            // Fetch dob + phone from Realtime DB
                             fetchUserDetails(item);
                         }
                     })
@@ -183,7 +181,6 @@ public class PatientListActivity extends AppCompatActivity {
                         item.dob   = snapshot.child("dob").getValue(String.class);
                         item.phone = snapshot.child("phone").getValue(String.class);
 
-                        // Build full name from Realtime DB if not already in Firestore
                         if (item.patientName == null || item.patientName.isEmpty()) {
                             String first = snapshot.child("firstName").getValue(String.class);
                             String last  = snapshot.child("lastName").getValue(String.class);
@@ -218,7 +215,7 @@ public class PatientListActivity extends AppCompatActivity {
                 finish();
                 return true;
             }
-            if (id == R.id.nav_profile){
+            if (id == R.id.nav_profile) {
                 startActivity(new Intent(this, DoctorPersonalProfile.class));
                 finish();
                 return true;

@@ -33,7 +33,7 @@ public class ScheduleActivity extends AppCompatActivity {
     private TextView     tvSelectedDate, tvTotalCount;
 
     // ── Tab date buttons ───────────────────────────────────────────────────────
-    private TextView tabYesterday, tabToday, tabTomorrow, tabCustom;
+    private TextView tabAll, tabYesterday, tabToday, tabTomorrow, tabCustom;
 
     // ── Firebase ───────────────────────────────────────────────────────────────
     private FirebaseFirestore firestore;
@@ -62,10 +62,11 @@ public class ScheduleActivity extends AppCompatActivity {
         firestore = FirebaseFirestore.getInstance();
 
         bindViews();
+        autoEndPastAppointments();
         setupTabs();
 
-        // Default: today
-        selectTab(tabToday, sdf.format(new Date()));
+        // Default: All
+        selectAllTab();
         setupBottomNav();
     }
 
@@ -77,6 +78,7 @@ public class ScheduleActivity extends AppCompatActivity {
         tvSelectedDate = findViewById(R.id.tvSelectedDate);
         tvTotalCount  = findViewById(R.id.tvTotalCount);
 
+        tabAll        = findViewById(R.id.tabAll);
         tabYesterday  = findViewById(R.id.tabYesterday);
         tabToday      = findViewById(R.id.tabToday);
         tabTomorrow   = findViewById(R.id.tabTomorrow);
@@ -106,7 +108,9 @@ public class ScheduleActivity extends AppCompatActivity {
         cal.add(Calendar.DAY_OF_YEAR, 1);
         String tomorrow = sdf.format(cal.getTime());
 
-        tabYesterday.setOnClickListener(v -> selectTab(tabYesterday, yesterday));
+        tabAll.setOnClickListener(v -> selectAllTab());
+
+        tabYesterday.setOnClickListener(v -> selectFinishedTab());
         tabToday.setOnClickListener(v    -> selectTab(tabToday,     today));
         tabTomorrow.setOnClickListener(v -> selectTab(tabTomorrow,  tomorrow));
 
@@ -133,7 +137,7 @@ public class ScheduleActivity extends AppCompatActivity {
         int active  = getResources().getColor(R.color.teal_primary, null);
         int activeTxt = getResources().getColor(android.R.color.white, null);
 
-        for (TextView tab : new TextView[]{tabYesterday, tabToday, tabTomorrow, tabCustom}) {
+        for (TextView tab : new TextView[]{tabAll, tabYesterday, tabToday, tabTomorrow, tabCustom}) {
             tab.setBackgroundResource(R.drawable.tab_inactive_bg);
             tab.setTextColor(inactiveTxt);
         }
@@ -150,6 +154,74 @@ public class ScheduleActivity extends AppCompatActivity {
         }
 
         loadSchedule(date);
+    }
+
+    // ── All Tab ──────────────────────────────────────────────────────────────
+
+    private void selectAllTab() {
+        int inactiveTxt = getResources().getColor(R.color.tab_inactive_text, null);
+        int activeTxt   = getResources().getColor(android.R.color.white, null);
+
+        for (TextView tab : new TextView[]{tabAll, tabYesterday, tabToday, tabTomorrow, tabCustom}) {
+            tab.setBackgroundResource(R.drawable.tab_inactive_bg);
+            tab.setTextColor(inactiveTxt);
+        }
+        tabAll.setBackgroundResource(R.drawable.tab_active_bg);
+        tabAll.setTextColor(activeTxt);
+
+        tvSelectedDate.setText("All Appointments");
+        loadAllSchedules();
+    }
+
+    private void loadAllSchedules() {
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user == null) return;
+
+        tvTotalCount.setText("Loading…");
+        layoutEmpty.setVisibility(View.GONE);
+        rvSchedule.setVisibility(View.GONE);
+
+        firestore.collection("appointments")
+                .whereEqualTo("doctorId", user.getUid())
+                .whereEqualTo("status",   "confirmed")
+                .orderBy("date", Query.Direction.ASCENDING)
+                .orderBy("time", Query.Direction.ASCENDING)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    appointmentList.clear();
+
+                    if (snapshot.isEmpty()) {
+                        tvTotalCount.setText("0 appointments");
+                        layoutEmpty.setVisibility(View.VISIBLE);
+                        rvSchedule.setVisibility(View.GONE);
+                        adapter.notifyDataSetChanged();
+                        return;
+                    }
+
+                    for (com.google.firebase.firestore.DocumentSnapshot doc : snapshot.getDocuments()) {
+                        AppointmentItem item = new AppointmentItem();
+                        item.appointmentId = doc.getString("appointmentId");
+                        item.patientId     = doc.getString("patientId");
+                        item.patientName   = doc.getString("patientName");
+                        item.time          = doc.getString("time");
+                        item.type          = doc.getString("type");
+                        item.status        = doc.getString("status");
+                        item.notes         = doc.getString("notes");
+                        item.date          = doc.getString("date");
+                        appointmentList.add(item);
+                    }
+
+                    tvTotalCount.setText(appointmentList.size() + " confirmed");
+                    layoutEmpty.setVisibility(View.GONE);
+                    rvSchedule.setVisibility(View.VISIBLE);
+                    adapter.notifyDataSetChanged();
+                })
+                .addOnFailureListener(e -> {
+                    tvTotalCount.setText("Error");
+                    Toast.makeText(this,
+                            "Failed to load schedule: " + e.getMessage(),
+                            Toast.LENGTH_SHORT).show();
+                });
     }
 
     // ── Firestore Query ───────────────────────────────────────────────────────
@@ -231,6 +303,94 @@ public class ScheduleActivity extends AppCompatActivity {
             }
             return false;
         });
+    }
+
+
+    private void autoEndPastAppointments() {
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user == null) return;
+
+        String today = sdf.format(Calendar.getInstance().getTime());
+
+        firestore.collection("appointments")
+                .whereEqualTo("doctorId", user.getUid())
+                .whereEqualTo("status", "confirmed")
+                .whereLessThan("date", today)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                        doc.getReference().update("status", "ended");
+                    }
+                });
+    }
+
+
+    private void selectFinishedTab() {
+        int inactiveTxt = getResources().getColor(R.color.tab_inactive_text, null);
+        int activeTxt   = getResources().getColor(android.R.color.white, null);
+
+        for (TextView tab : new TextView[]{tabAll, tabYesterday, tabToday, tabTomorrow, tabCustom}) {
+            tab.setBackgroundResource(R.drawable.tab_inactive_bg);
+            tab.setTextColor(inactiveTxt);
+        }
+        tabYesterday.setBackgroundResource(R.drawable.tab_active_bg);
+        tabYesterday.setTextColor(activeTxt);
+
+        tvSelectedDate.setText("Finished Appointments");
+        loadFinishedSchedules();
+    }
+
+    private void loadFinishedSchedules() {
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user == null) return;
+
+        tvTotalCount.setText("Loading…");
+        layoutEmpty.setVisibility(View.GONE);
+        rvSchedule.setVisibility(View.GONE);
+
+        String today = sdf.format(Calendar.getInstance().getTime());
+
+        firestore.collection("appointments")
+                .whereEqualTo("doctorId", user.getUid())
+                .whereEqualTo("status", "ended")
+                .orderBy("date", Query.Direction.DESCENDING)
+                .orderBy("time", Query.Direction.ASCENDING)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    appointmentList.clear();
+
+                    if (snapshot.isEmpty()) {
+                        tvTotalCount.setText("0 appointments");
+                        layoutEmpty.setVisibility(View.VISIBLE);
+                        rvSchedule.setVisibility(View.GONE);
+                        adapter.notifyDataSetChanged();
+                        return;
+                    }
+
+                    for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                        AppointmentItem item = new AppointmentItem();
+                        item.appointmentId = doc.getString("appointmentId");
+                        item.patientId     = doc.getString("patientId");
+                        item.patientName   = doc.getString("patientName");
+                        item.time          = doc.getString("time");
+                        item.type          = doc.getString("type");
+                        item.status        = doc.getString("status");
+                        item.notes         = doc.getString("notes");
+                        item.date          = doc.getString("date");
+                        appointmentList.add(item);
+                    }
+
+                    tvTotalCount.setText(appointmentList.size() + " finished");
+                    layoutEmpty.setVisibility(View.GONE);
+                    rvSchedule.setVisibility(View.VISIBLE);
+                    adapter.notifyDataSetChanged();
+                })
+                .addOnFailureListener(e -> {
+                    tvTotalCount.setText("Error");
+                    Toast.makeText(this,
+                            "Failed to load finished: " + e.getMessage(),
+                            Toast.LENGTH_SHORT).show();
+                });
     }
 
 

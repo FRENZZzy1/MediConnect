@@ -10,11 +10,16 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ViewHolder> {
 
     private final List<AppointmentItem> items;
+    private final SimpleDateFormat inputSdf   = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+    private final SimpleDateFormat displaySdf = new SimpleDateFormat("MMM d, yyyy", Locale.getDefault());
 
     public ScheduleAdapter(List<AppointmentItem> items) {
         this.items = items;
@@ -32,49 +37,77 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ViewHo
     public void onBindViewHolder(@NonNull ViewHolder h, int position) {
         AppointmentItem item = items.get(position);
 
-        // ── Time ──────────────────────────────────────────────────────────────
+        // ── Position number (timeline dot) ────────────────────────────────────
+        h.tvPositionNumber.setText(String.valueOf(position + 1));
+
+        // ── Time (left column) ────────────────────────────────────────────────
         h.tvTime.setText(item.time != null ? item.time : "--:--");
 
-        // ── Doctor name (instead of patient) ────────────────────────────────────
-        String doctorName = (item.doctorName != null && !item.doctorName.isEmpty())
-                ? item.doctorName : "" + ((item.patientName != null && !item.patientName.isEmpty())
-                ? item.patientName : "Unknown");
-        h.tvDoctorName.setText(doctorName);
-
-        // ── Doctor Specialty ───────────────────────────────────────────────────
-        if (h.tvDoctorSpecialty != null) {
-            String specialty = (item.specialty != null && !item.specialty.isEmpty())
-                    ? item.specialty : "Specialist";
-            h.tvDoctorSpecialty.setText(specialty);
-        }
+        // ── Patient name (doctor side shows patient) ──────────────────────────
+        String name = (item.patientName != null && !item.patientName.isEmpty())
+                ? item.patientName.trim() : "Unknown Patient";
+        h.tvPatientName.setText(name);
 
         // ── Initials avatar ───────────────────────────────────────────────────
-        String initials = getInitials(doctorName);
-        h.tvInitials.setText(initials);
+        h.tvInitials.setText(getInitials(name));
+
+        // ── Date subtitle (below patient name) ───────────────────────────────
+        if (item.date != null && !item.date.isEmpty()) {
+            try {
+                Date parsed = inputSdf.parse(item.date);
+                h.tvAppointmentDate.setText(parsed != null ? displaySdf.format(parsed) : item.date);
+            } catch (Exception e) {
+                h.tvAppointmentDate.setText(item.date);
+            }
+        } else {
+            h.tvAppointmentDate.setText("No date");
+        }
 
         // ── Appointment type chip ─────────────────────────────────────────────
-        String type = item.type != null ? item.type : "Consultation";
+        String type = item.type != null && !item.type.isEmpty() ? item.type : "Consultation";
         h.tvType.setText(type);
         setTypeChipColor(h.tvType, type);
 
-        // ── Hospital ───────────────────────────────────────────────────────────
-        if (h.tvHospital != null) {
-            String hospital = (item.hospital != null && !item.hospital.isEmpty())
-                    ? item.hospital : "";
-            h.tvHospital.setText(hospital);
-            h.tvHospital.setVisibility(hospital.isEmpty() ? View.GONE : View.VISIBLE);
-        }
-
-        // ── Notes ─────────────────────────────────────────────────────────────
-        if (item.notes != null && !item.notes.isEmpty()) {
-            h.tvNotes.setVisibility(View.VISIBLE);
-            h.tvNotes.setText(item.notes);
+        // ── Date detail row ───────────────────────────────────────────────────
+        if (item.date != null && !item.date.isEmpty()) {
+            try {
+                Date parsed = inputSdf.parse(item.date);
+                h.tvDate.setText(parsed != null ? displaySdf.format(parsed) : item.date);
+            } catch (Exception e) {
+                h.tvDate.setText(item.date);
+            }
         } else {
-            h.tvNotes.setVisibility(View.GONE);
+            h.tvDate.setText("N/A");
         }
 
-        // ── Position number ───────────────────────────────────────────────────
-        h.tvPositionNumber.setText(String.valueOf(position + 1));
+        // ── Time detail row ───────────────────────────────────────────────────
+        h.tvTimeDetail.setText(item.time != null ? item.time : "N/A");
+
+        // ── Appointment ID / reference ────────────────────────────────────────
+        h.tvAppointmentId.setText(item.appointmentId != null ? item.appointmentId : "N/A");
+
+        // ── Status ────────────────────────────────────────────────────────────
+        String status = item.status != null ? item.status : "confirmed";
+
+        View statusDot = h.itemView.findViewById(R.id.viewStatusDot); // add this id to your XML dot View
+        if ("ended".equalsIgnoreCase(status)) {
+            h.tvStatus.setTextColor(Color.parseColor("#94A3B8")); // grey
+        } else {
+            h.tvStatus.setTextColor(Color.parseColor("#10B981")); // green
+        }
+
+
+
+
+        h.tvStatus.setText(capitalize(status));
+
+        // ── Notes (show row only if notes exist) ──────────────────────────────
+        if (item.notes != null && !item.notes.trim().isEmpty()) {
+            h.layoutNotes.setVisibility(View.VISIBLE);
+            h.tvNotes.setText(item.notes.trim());
+        } else {
+            h.layoutNotes.setVisibility(View.GONE);
+        }
 
         // ── Connector line: hide for last item ────────────────────────────────
         h.viewConnector.setVisibility(
@@ -94,8 +127,12 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ViewHo
                 .toUpperCase();
     }
 
+    private String capitalize(String s) {
+        if (s == null || s.isEmpty()) return "";
+        return s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
+    }
+
     private void setTypeChipColor(TextView chip, String type) {
-        // Match your app's appointment types to colour codes
         String lower = type.toLowerCase();
         int bg, text;
 
@@ -112,7 +149,6 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ViewHo
             bg   = Color.parseColor("#FFF7ED");
             text = Color.parseColor("#EA580C");
         } else {
-            // Default — teal (matches your app theme)
             bg   = Color.parseColor("#ECFEFF");
             text = Color.parseColor("#0E7490");
         }
@@ -124,20 +160,27 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ViewHo
     // ── ViewHolder ────────────────────────────────────────────────────────────
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvTime, tvDoctorName, tvDoctorSpecialty, tvInitials, tvType, tvNotes, tvHospital, tvPositionNumber;
-        View     viewConnector;
+        TextView tvTime, tvPositionNumber;
+        TextView tvInitials, tvPatientName, tvAppointmentDate;
+        TextView tvType, tvDate, tvTimeDetail, tvAppointmentId, tvStatus;
+        TextView tvNotes;
+        View     layoutNotes, viewConnector;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvTime             = itemView.findViewById(R.id.tvTime);
-            tvDoctorName       = itemView.findViewById(R.id.tvDoctorName);
-            tvDoctorSpecialty  = itemView.findViewById(R.id.tvDoctorSpecialty);
-            tvInitials         = itemView.findViewById(R.id.tvInitials);
-            tvType             = itemView.findViewById(R.id.tvType);
-            tvNotes            = itemView.findViewById(R.id.tvNotes);
-            tvHospital         = itemView.findViewById(R.id.tvHospital);
-            tvPositionNumber   = itemView.findViewById(R.id.tvPositionNumber);
-            viewConnector      = itemView.findViewById(R.id.viewConnector);
+            tvTime            = itemView.findViewById(R.id.tvTime);
+            tvPositionNumber  = itemView.findViewById(R.id.tvPositionNumber);
+            tvInitials        = itemView.findViewById(R.id.tvInitials);
+            tvPatientName     = itemView.findViewById(R.id.tvPatientName);      // ← fixed (was tvDoctorName)
+            tvAppointmentDate = itemView.findViewById(R.id.tvAppointmentDate);  // ← fixed (was tvDoctorSpecialty)
+            tvType            = itemView.findViewById(R.id.tvType);
+            tvDate            = itemView.findViewById(R.id.tvDate);
+            tvTimeDetail      = itemView.findViewById(R.id.tvTimeDetail);
+            tvAppointmentId   = itemView.findViewById(R.id.tvAppointmentId);
+            tvStatus          = itemView.findViewById(R.id.tvStatus);
+            tvNotes           = itemView.findViewById(R.id.tvNotes);
+            layoutNotes       = itemView.findViewById(R.id.layoutNotes);
+            viewConnector     = itemView.findViewById(R.id.viewConnector);
         }
     }
 }
