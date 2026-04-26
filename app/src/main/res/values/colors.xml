@@ -91,6 +91,7 @@
     <color name="textPrimary">#000000</color>
     <color name="textSecondary">#666666</color>
 
+    <color name="Patient_Name">#000000</color>
     <color name="startcolorDashboard">#044A5A</color>
     <color name="centertcolorDashboard">#0891B2</color>
     <color name="endcolorDashboard">#06B6D4</color>

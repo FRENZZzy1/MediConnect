@@ -42,24 +42,25 @@
     </LinearLayout>
 
     <!-- ViewPager -->
+
+    <!-- Bottom Nav -->
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="140dp"
-        android:layout_marginBottom="80dp"/>
+        android:layout_marginBottom="80dp" />
 
-    <!-- Bottom Nav -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="@color/white"
+        android:background="@color/cardBackground"
         app:elevation="12dp"
         app:itemIconTint="@drawable/bottom_nav_selector"
         app:itemTextColor="@drawable/bottom_nav_selector"
         app:labelVisibilityMode="labeled"
-        app:menu="@menu/menu_doctor_dashboard"/>
+        app:menu="@menu/menu_doctor_dashboard" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

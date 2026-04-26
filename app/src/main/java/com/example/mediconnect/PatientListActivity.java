@@ -218,7 +218,11 @@ public class PatientListActivity extends AppCompatActivity {
                 finish();
                 return true;
             }
-            if (id == R.id.nav_profile) return true;
+            if (id == R.id.nav_profile){
+                startActivity(new Intent(this, DoctorPersonalProfile.class));
+                finish();
+                return true;
+            }
             return false;
         });
     }

@@ -37,7 +37,7 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ViewHo
 
         // ── Doctor name (instead of patient) ────────────────────────────────────
         String doctorName = (item.doctorName != null && !item.doctorName.isEmpty())
-                ? item.doctorName : "Dr. " + ((item.patientName != null && !item.patientName.isEmpty())
+                ? item.doctorName : "" + ((item.patientName != null && !item.patientName.isEmpty())
                 ? item.patientName : "Unknown");
         h.tvDoctorName.setText(doctorName);
 

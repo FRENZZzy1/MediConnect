@@ -1,6 +1,7 @@
 package com.example.mediconnect;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -10,9 +11,11 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
@@ -28,12 +31,17 @@ import java.util.Map;
 
 public class DoctorPersonalProfile extends AppCompatActivity {
 
+    // ── Dark-mode prefs (doctor-side only) ────────────────────────────────────
+    public static final String DOCTOR_PREFS_NAME = "doctor_prefs";
+    public static final String DOCTOR_KEY_DARK_MODE = "doctor_dark_mode";
+
     // ── Views ──────────────────────────────────────────────────────────────────
     private TextView        tvInitials;
     private EditText        etFullName, etEmail, etSpecialization;
     private EditText        etClinicName, etLocation, etConsultationFee;
     private EditText        etConsultationHours, etAvailableDays, etPrcLicense;
     private MaterialButton  btnSaveProfile, btnChangePassword;
+    private SwitchMaterial  switchDarkMode;
     private BottomNavigationView bottomNav;
 
     // ── Firebase ───────────────────────────────────────────────────────────────
@@ -60,6 +68,7 @@ public class DoctorPersonalProfile extends AppCompatActivity {
 
         bindViews();
         loadProfile();
+        setupDarkModeToggle();
 
         btnSaveProfile.setOnClickListener(v -> saveProfile());
         btnChangePassword.setOnClickListener(v -> showChangePasswordDialog());
@@ -82,7 +91,30 @@ public class DoctorPersonalProfile extends AppCompatActivity {
         etPrcLicense        = findViewById(R.id.etPrcLicense);
         btnSaveProfile      = findViewById(R.id.btnSaveProfile);
         btnChangePassword   = findViewById(R.id.btnChangePassword);
+        switchDarkMode      = findViewById(R.id.switchDarkMode);
         bottomNav           = findViewById(R.id.bottomNav);
+    }
+
+    // ─── Dark Mode ────────────────────────────────────────────────────────────
+
+    private void setupDarkModeToggle() {
+        SharedPreferences prefs = getSharedPreferences(DOCTOR_PREFS_NAME, MODE_PRIVATE);
+        int savedMode = prefs.getInt(DOCTOR_KEY_DARK_MODE, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+
+        // Reflect current state on the switch (checked = dark mode ON)
+        switchDarkMode.setChecked(savedMode == AppCompatDelegate.MODE_NIGHT_YES);
+
+        switchDarkMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            int newMode = isChecked
+                    ? AppCompatDelegate.MODE_NIGHT_YES
+                    : AppCompatDelegate.MODE_NIGHT_NO;
+
+            // Persist the preference using the doctor-specific key
+            prefs.edit().putInt(DOCTOR_KEY_DARK_MODE, newMode).apply();
+
+            // Apply immediately — all doctor activities will pick this up
+            AppCompatDelegate.setDefaultNightMode(newMode);
+        });
     }
 
     // ─── Load Profile ─────────────────────────────────────────────────────────

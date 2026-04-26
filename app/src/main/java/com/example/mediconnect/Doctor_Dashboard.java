@@ -69,21 +69,6 @@ public class Doctor_Dashboard extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_doctor_dashboard);
-
-        SwitchMaterial switchDarkMode = findViewById(R.id.switchDarkMode);
-
-        switchDarkMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
-
-            if (isChecked) {
-                AppCompatDelegate.setDefaultNightMode(
-                        AppCompatDelegate.MODE_NIGHT_YES);
-            } else {
-                AppCompatDelegate.setDefaultNightMode(
-                        AppCompatDelegate.MODE_NIGHT_NO);
-            }
-
-        });
-
         mAuth     = FirebaseAuth.getInstance();
         dbRef     = FirebaseDatabase.getInstance().getReference("Doctors");
         firestore = FirebaseFirestore.getInstance();

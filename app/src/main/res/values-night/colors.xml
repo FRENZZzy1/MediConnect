@@ -104,4 +104,5 @@
     <color name="centertcolorDashboard">#0891B2</color>
     <color name="endcolorDashboard">#06B6D4</color>
 
+    <color name="Patient_Name">#FFFFFF</color>
 </resources>

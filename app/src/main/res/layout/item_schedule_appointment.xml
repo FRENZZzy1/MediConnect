@@ -79,7 +79,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="14dp">
+            android:padding="14dp"
+            android:background="@color/cardBackground">
 
             <!-- Top row: avatar + name + type chip -->
             <LinearLayout
@@ -113,8 +114,8 @@
                         android:id="@+id/tvDoctorName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Dr. Juan"
-                        android:textColor="#1E293B"
+                        android:text=""
+                        android:textColor="@color/Patient_Name"
                         android:textSize="14sp"
                         android:textStyle="bold"
                         android:maxLines="1"

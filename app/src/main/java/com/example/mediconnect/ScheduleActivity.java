@@ -225,7 +225,7 @@ public class ScheduleActivity extends AppCompatActivity {
                 return true;
             }
             if (id == R.id.nav_patients) {
-
+                startActivity(new Intent(this, PatientListActivity.class));
                 finish();
                 return true;
             }
